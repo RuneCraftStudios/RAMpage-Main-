@@ -5,10 +5,6 @@ using TMPro;
 
 public class Health : MonoBehaviour
 {
-    [Header("Identify User")]
-    public bool isPlayer; // Indicates if the GameObject is a player
-    public bool isEnemy; // Indicates if the GameObject is an enemy
-
     [Header("Main Parameters")]
     public int maxHealth = 100; // Maximum health of the GameObject
     public int maxShield = 100; // Maximum shield of the GameObject
@@ -25,25 +21,9 @@ public class Health : MonoBehaviour
     private float currentRechargeAmount; // Accumulated recharge amount for the shield
     [SerializeField] private bool isElectrified = false; // Indicates if the target is electrified
     [SerializeField] private bool isIgnited = false; // Indicates if the target is ignited
-
-    [Header("EnemyUISettings")]
-    public GameObject BaseDamageUI; // Reference to the damage number prefab
-    public GameObject ElectricityDamageUI; //Reference to the electric damage number prefab
-    public GameObject FireDamageUI; //Reference to the fire damage number prefab
-    [SerializeField] private float textDisappearTime = 2f;
-    [SerializeField] private float DeathAnimationTime;
-
+ 
     private GameManager GameManager;
-
-
-
-
-
-    // Queue to store incoming damage messages
     private Queue<int> damageQueue = new Queue<int>();
-
-
-    public EnemyAiTutorial enemyAi;
     // Inside your Awake() method
     private void Awake()
     {
@@ -53,11 +33,7 @@ public class Health : MonoBehaviour
         lastDamageTime = Time.time; // Initialize lastDamageTime to current time
         isElectrified = false;
         isIgnited = false;
-
-        // Initialize parameters and features based on whether the GameObject is a player or an enemy
     }
-
-
 
     public bool IsElectrified
     {
@@ -143,11 +119,6 @@ public class Health : MonoBehaviour
             // Apply normal damage to health
             currentHealth -= damage;
             if (currentHealth <= 0)
-                if (isEnemy)
-                {
-                    enemyAi.ChangeState(EnemyState.Die);
-                }
-                else if (isPlayer)
                 {
                     Die();
                 }
@@ -156,13 +127,11 @@ public class Health : MonoBehaviour
 
         // Update lastDamageTime to current time
         lastDamageTime = Time.time;
-        SpawnDamageNumber(damage);
     }
 
 
     public IEnumerator DamageOverTimeCoroutine(int damageOverTime, int effectDuration, bool isElementalDamage = false)
     {
-        enemyAi.ChangeState(EnemyState.Stun);
 
         float timer = 0f;
 
@@ -185,20 +154,12 @@ public class Health : MonoBehaviour
                 currentHealth -= damageOverTime;
                 if (currentHealth <= 0)
                 {
-                    if (isEnemy)
-                    {
-                        enemyAi.ChangeState(EnemyState.Die);
-                    }
-                    else if (isPlayer)
-                    {
-                        Die();
-                    }
+                    
+                    Die();
+                    
                     yield break; // Exit the coroutine if health reaches zero
                 }
             }
-
-
-            SpawnDamageNumber(damageOverTime);
             timer += 1f; // Increment timer by 1 second
             yield return new WaitForSeconds(1f);
         }
@@ -237,66 +198,8 @@ public class Health : MonoBehaviour
 
     void Die()
     {
-        if (isPlayer)
-        {
             GameManager.instance.PlayerDied();
-        }
     }
-
-
-    void SpawnDamageNumber(int damage, bool isElemental = false)
-    {
-        // Check if the GameObject is an enemy and if the damage number prefab is assigned
-        if (isEnemy)
-        {
-            GameObject damageNumberPrefab;
-
-            
-                // Check if the target is electrified or ignited
-                if (IsElectrified)
-                {
-                    damageNumberPrefab = ElectricityDamageUI; // Use ElectricityDamageUI prefab
-                }
-                else if (IsIgnited)
-                {
-                    damageNumberPrefab = FireDamageUI; // Use FireDamageUI prefab
-                }
-                else
-                {
-                    damageNumberPrefab = BaseDamageUI; // Use BaseDamageUI prefab as default
-                }
-           
-            
-
-            // Check if the damage number prefab is assigned
-            if (damageNumberPrefab != null)
-            {
-                // Instantiate the damage number prefab at the exact position
-                GameObject damageNumberObject = Instantiate(damageNumberPrefab, damageNumberPrefab.transform.position, Quaternion.identity);
-
-                // Get the TextMeshPro component from the child object of damageNumberObject
-                TextMeshPro damageText = damageNumberObject.GetComponentInChildren<TextMeshPro>();
-
-                // Set the damage number text to display the damage value
-                if (damageText != null)
-                {
-                    damageText.text = damage.ToString();
-                }
-                else
-                {
-                    Debug.LogError("TextMeshPro component not found in the child object of damageNumberPrefab.");
-                }
-
-                // Remove the damage number text after a certain time
-                Destroy(damageNumberObject, textDisappearTime);
-            }
-            else
-            {
-                Debug.LogError("Damage number prefab is not assigned or GameObject is not an enemy.");
-            }
-        }
-    }
-
     // Accessors for current health, shield, and energy
     public int CurrentHealth
     {

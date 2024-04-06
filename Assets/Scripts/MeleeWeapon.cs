@@ -26,7 +26,7 @@ public class MeleeWeapon : MonoBehaviour
         // Check if the collider or its parent GameObject has a Health component
         Health targetHealth = other.GetComponentInParent<Health>();
 
-        if (targetHealth != null && canDealDamage && targetHealth.isEnemy == true)
+        if (targetHealth != null && canDealDamage)
         {
             // Apply damage to the collided GameObject's Health component
             targetHealth.TakeDamage(damage);

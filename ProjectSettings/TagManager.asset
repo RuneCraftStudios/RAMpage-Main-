@@ -14,10 +14,10 @@ TagManager:
   - DirectInteractor
   - Ground
   - Obstacle
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - PlayerProjectile
+  - Enemy
+  - EnemyProjectile
   - 
   - 
   - 

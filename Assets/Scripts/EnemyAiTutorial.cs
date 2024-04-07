@@ -77,6 +77,11 @@ public class EnemyAiTutorial : MonoBehaviour
     private Coroutine checkPlayerCoroutine;
     private IEnumerator searchWalkPointCoroutine;
     public float checkInterval = 0.1f;
+    public EnemyState CurrentState
+    {
+        get { return currentState; }
+        private set { currentState = value; }
+    }
 
 
 
@@ -143,36 +148,35 @@ public class EnemyAiTutorial : MonoBehaviour
 
                 break;
             case EnemyState.Patrol:
-                animator.SetBool("Patroling", true);
+                
                 agent.speed = patrolSpeed; // Set patrol speed
                 Patroling();
                 Debug.Log("EnteredPatrolState");
                 break;
             case EnemyState.Chase:
-                animator.SetBool("Chasing", true);
+                
                 agent.speed = chaseSpeed; // Set chase speed
                 ChasePlayer(); // Chase the player
                 Debug.Log("EnteredChaseState");
                 break;
             case EnemyState.Attack:
-                animator.Play("Attack");
+                
                 Debug.Log("EnteredAttackState");
                 StartCoroutine(PrepareAttack());
                 // Code for Attack state
                 break;
             case EnemyState.Stun:
                 isStunned = true;
-                animator.SetBool("Stunned", true);
+                
                 agent.isStopped = true;
                 StartCoroutine(RecoverFromStun(StunDuration));
                 break;
             case EnemyState.KnockBack:
-                animator.SetBool("IsKnockedBack", true);
+                
                 agent.isStopped = true;
                 StartCoroutine(RecoverFromKnockBack());
                 break;
             case EnemyState.Die:
-                animator.SetBool("IsDied", true);
                 Debug.Log("EnteredDieState");
                 agent.isStopped = true;
                 sightRange = 0;
@@ -187,20 +191,12 @@ public class EnemyAiTutorial : MonoBehaviour
     {
         currentState = newState;
 
-        animator.SetBool("Patroling", false);
-        animator.SetBool("Chasing", false);
-        animator.SetBool("Attacking", false);
-        animator.SetTrigger("ChangeState");
+        
         StartCoroutine(ResetTrigger(ResetTriggerTime));
 
         if (gameObject.activeInHierarchy) // Check if the enemy is still active
         {
             StartCoroutine(EnableMeshRenderersAfterDelay(1.0f)); // Adjust the delay as needed
-        }
-        
-        if (currentState != EnemyState.WaitingToBeSpawned)
-        {
-            animator.SetBool("IsActive", true);
         }
 
     }
@@ -394,7 +390,6 @@ public class EnemyAiTutorial : MonoBehaviour
     {
         yield return new WaitForSeconds(StunDuration);
         isStunned = false;
-        animator.SetBool("Stunned", false);
         agent.isStopped = false;
         // Perform checks and transition to appropriate state after recovering from stun
         // For example, you can check if the player is nearby and transition to Chase state
@@ -408,7 +403,6 @@ public class EnemyAiTutorial : MonoBehaviour
     {
         yield return new WaitForSeconds(ResetTriggerTime);
 
-        animator.ResetTrigger("ChangeState");
     }
     private IEnumerator SearchWalkPointCoroutine()
     {
@@ -452,7 +446,6 @@ public class EnemyAiTutorial : MonoBehaviour
     {
         yield return new WaitForSeconds(2.0f);
         agent.isStopped = false;
-        animator.SetBool("IsKnockedBack", false);
         MakeDecision();
     }
 

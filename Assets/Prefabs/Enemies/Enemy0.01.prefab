@@ -168,6 +168,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: '
 
+
 '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -179,13 +180,13 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4290998562
   m_fontColor: {r: 0.13336597, g: 0.44325596, b: 0.764151, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
+  m_enableVertexGradient: 1
+  m_colorMode: 2
   m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+    topLeft: {r: 0.13333334, g: 0.4431373, b: 0.76470596, a: 1}
+    topRight: {r: 0.13333334, g: 0.4431373, b: 0.76470596, a: 1}
+    bottomLeft: {r: 0, g: 0.9505663, b: 1, a: 1}
+    bottomRight: {r: 0, g: 0.9505663, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
@@ -261,6 +262,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8547807417598251554}
+  - component: {fileID: 3068422372209417365}
   m_Layer: 0
   m_Name: BaseDamageUI
   m_TagString: Untagged
@@ -284,6 +286,27 @@ Transform:
   - {fileID: 8097547337353155017}
   m_Father: {fileID: 8430389889688877920}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &3068422372209417365
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 691010391991016858}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5278e8c127530614bab89b38aaf4b639, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1584682979781510390
 GameObject:
   m_ObjectHideFlags: 0
@@ -326,6 +349,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7854718888991556010}
+  - component: {fileID: 2394208856781900116}
   m_Layer: 0
   m_Name: ElectricityDamageUI
   m_TagString: Untagged
@@ -349,6 +373,27 @@ Transform:
   - {fileID: 1776091508720844440}
   m_Father: {fileID: 8430389889688877920}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &2394208856781900116
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3778768274430264733}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 844346cc0c9c62b41bb2c9e9885997ab, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &5258018815913541143
 GameObject:
   m_ObjectHideFlags: 0
@@ -484,7 +529,7 @@ Transform:
   m_GameObject: {fileID: 5887351792459677059}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.812, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -777,6 +822,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8054839797144586165}
+  - component: {fileID: 4463748471471440768}
   m_Layer: 0
   m_Name: FireDamageUI
   m_TagString: Untagged
@@ -800,6 +846,27 @@ Transform:
   - {fileID: 4741243859482715198}
   m_Father: {fileID: 8430389889688877920}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &4463748471471440768
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7015222308664561680}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d651a4b845d2e134995506862a128860, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7563679021848026180
 GameObject:
   m_ObjectHideFlags: 0
@@ -968,6 +1035,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: '
 
+
 '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -983,9 +1051,9 @@ MonoBehaviour:
   m_colorMode: 3
   m_fontColorGradient:
     topLeft: {r: 0.9056604, g: 0.10679956, b: 0.1609216, a: 1}
-    topRight: {r: 0.9056604, g: 0.7722288, b: 0.10679956, a: 1}
+    topRight: {r: 0.13333334, g: 0.4431373, b: 0.76470596, a: 1}
     bottomLeft: {r: 0.9058824, g: 0.7725491, b: 0.10588236, a: 1}
-    bottomRight: {r: 0.9058824, g: 0.10588236, b: 0.16078432, a: 1}
+    bottomRight: {r: 0, g: 0.9505663, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
@@ -1220,6 +1288,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: '
 
+
 '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1235,9 +1304,9 @@ MonoBehaviour:
   m_colorMode: 3
   m_fontColorGradient:
     topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 0.13333334, g: 0.4431373, b: 0.76470596, a: 1}
     bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 0, g: 0.9505663, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0

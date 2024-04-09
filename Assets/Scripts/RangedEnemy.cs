@@ -6,29 +6,28 @@ using UnityEngine.AI;
 public class RangedEnemy : EnemyAiTutorial
 {
     public float timeBetweenAttacks;
-    bool alreadyAttacked;
-    public float raycastCooldownDuration = 1.0f;
+    public float raycastCooldownDuration;
     private float lastRaycastTime; // Variable to store the time of the last raycast
-    public float relocateTime = 3.0f; // Time to wait before attempting to relocate
-    private float lastRelocateTime; // Time when the enemy last attempted to relocate
-    private bool isRelocating; // Flag to indicate if the enemy is currently relocating
+    private int totalRaycasts; // Counter for total raycasts
+    private int failedRaycasts; // Counter for failed raycasts
+    public GameObject grenade;
+    private float grenadeSpeed;
+    bool isGrenadeThrown = false;
+
+
+    public EnemyState RangedEnemyState { get; private set; }
+
+
     public void AttackPlayer()
     {
         if (!playerInAttackRange)
         {
-            MakeDecision();
+            ChangeState(EnemyState.Decision);
             return;
         }
 
-        // Rotate towards the player
-        RotateAgentTowardsPlayer();
-
         // Check if the enemy is currently attacking
-        if (!alreadyAttacked)
-        {
-            // Set the destination of the NavMeshAgent to the current position to prevent movement
-            agent.SetDestination(transform.position);
-        }
+        
 
         // Check if enough time has passed since the last raycast
         if (Time.time - lastRaycastTime < raycastCooldownDuration)
@@ -38,175 +37,119 @@ public class RangedEnemy : EnemyAiTutorial
         {
             foreach (Transform muzzleTransform in muzzleTransforms)
             {
-                // Calculate direction to the player
+                // Check if the enemy is currently relocating or throwing grenade
+                if (currentState == EnemyState.Relocating || currentState == EnemyState.ThrowingGrenade)
+                    return; // Stop raycast check while relocating or throwing grenade
+
+                // Calculate direction from muzzle to player center
                 Vector3 directionToPlayer = playerCollider.bounds.center - muzzleTransform.position;
+
+                // Rotate the muzzle towards the player's direction
+                Aim(directionToPlayer, muzzleTransform);
 
                 // Draw a debug ray to visualize the line of sight
                 Debug.DrawRay(muzzleTransform.position, directionToPlayer, Color.green, 2.0f); // Adjust color and duration as needed
 
-                // Perform raycast to check if there's a clear line of sight to the player
-                if (Physics.Raycast(muzzleTransform.position, directionToPlayer, out RaycastHit hit, Mathf.Infinity, PlayerLayer))
+                // Perform raycast check using the RaycastCheck function
+                RaycastHit hit;
+                totalRaycasts++; // Increment total raycasts counter
+                if (RaycastCheck(muzzleTransform.position, directionToPlayer, Mathf.Infinity, out hit, PlayerLayer))
                 {
-                    // Check if the hit object is tagged as the player
-                    if (hit.collider.CompareTag("Player"))
+                    RotateTowardsPlayer();
+                    // Attack Code: Instantiate projectile
+                    InstantiateProjectile(muzzleTransform);
+                    lastRaycastTime = Time.time; // Update the last raycast time
+                    failedRaycasts = 0; // Reset failed raycasts counter since the target is player
+                }
+                else
+                {
+                    failedRaycasts++; // Increment failed raycasts counter
+
+                    // Add behaviors based on the number of failed raycasts
+                    if (failedRaycasts == 2)
                     {
-                        // Check if there are obstacles between the enemy and the player
-                        if (!Physics.Linecast(muzzleTransform.position, playerCollider.bounds.center, GroundLayer))
-                        {
-                            // Rotate the muzzle towards the player's position
-                            muzzleTransform.rotation = Quaternion.LookRotation(directionToPlayer);
-
-                            // Attack Code: Instantiate projectile and apply force towards the player
-                            StartCoroutine(ProjectileBuffer());
-                            StartCoroutine(Firing(muzzleTransform));
-                            // Set alreadyAttacked to true to prevent multiple projectiles
-                            alreadyAttacked = true;
-                            lastRaycastTime = Time.time;
-                            Invoke(nameof(ResetAttack), timeBetweenAttacks);
-
-
-                            // Exit the loop once we successfully attack
-                            return;
-                        }
+                        ChangeState(EnemyState.Relocating);
                     }
-                    else
+                    else if (failedRaycasts == 3 || failedRaycasts == 4)
                     {
-                        // If the player is not visible within attack range, initiate relocation and attack
-                        StartCoroutine(RelocateAndAttack());
+                        ChangeState(EnemyState.Relocating);
+                    }
+                    else if (failedRaycasts >= 5)
+                    {
+                        ChangeState(EnemyState.ThrowingGrenade);
+                        failedRaycasts = 0; // Reset failed raycasts counter after throwing grenade
                     }
                 }
             }
         }
-
     }
 
-    public void RotateAgentTowardsPlayer()
+    private void InstantiateProjectile(Transform muzzleTransform)
     {
-        if (player != null)
-        {
-            // Calculate direction to the player
-            Vector3 directionToPlayer = player.position - transform.position;
-
-            // Create a rotation that looks at the player
-            Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
-
-            // Apply the rotation to the agent's transform
-            transform.rotation = targetRotation;
-        }
-        else
-        {
-            Debug.LogWarning("Player reference is null!");
-        }
+        // Instantiate projectile at muzzle position with proper rotation
+        Instantiate(Projectile, muzzleTransform.position, muzzleTransform.rotation);
     }
 
-    IEnumerator Firing(Transform muzzleTransform)
+    private void Aim(Vector3 directionToPlayer, Transform muzzleTransform)
     {
-        yield return new WaitForSeconds(1.0f);
-        Rigidbody rb = Instantiate(Projectile, muzzleTransform.position, muzzleTransform.rotation).GetComponent<Rigidbody>();
-        rb.AddForce(muzzleTransform.forward * forwardForce, ForceMode.Impulse);
-        rb.AddForce(Vector3.up * upwardForce, ForceMode.Impulse);
+        // Rotate the muzzle towards the player's direction
+        muzzleTransform.rotation = Quaternion.LookRotation(directionToPlayer);
     }
 
-    IEnumerator ProjectileBuffer()
+    private bool RaycastCheck(Vector3 origin, Vector3 direction, float maxDistance, out RaycastHit hitInfo, LayerMask targetLayer)
+    
     {
-        yield return new WaitForSeconds(ProjectileInitiateBuffer); // Wait for the buffer time
-    }
-
-
-    private IEnumerator RelocateAndAttack()
-    {
-        // Attempt to find a new position closer to the player
-        Vector3 newPosition = FindNewPosition();
-        agent.SetDestination(newPosition);
-
-        // Wait for the enemy to reach the new position
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, newPosition) < agent.stoppingDistance);
-
-        // Wait for a short duration before initiating the raycast
-        yield return new WaitForSeconds(1.0f); // Adjust this delay as needed
-
-        // Check if there's a clear line of sight to the player
-        if (Physics.Raycast(transform.position, player.position - transform.position, out RaycastHit hit, Mathf.Infinity, PlayerLayer))
+        // Perform raycast
+        if (Physics.Raycast(origin, direction, out hitInfo, maxDistance, targetLayer))
         {
             // Check if the hit object is tagged as the player
-            if (hit.collider.CompareTag("Player"))
+            if (hitInfo.collider.CompareTag("Player"))
             {
-                // Check if there are obstacles between the enemy and the player
-                if (!Physics.Linecast(transform.position, playerCollider.bounds.center, GroundLayer))
+                // Check if there are obstacles between the origin and hit point
+                if (!Physics.Linecast(origin, hitInfo.point, ObstacleLayers))
                 {
-                    // Enemy has a clear line of sight to the player, initiate attack
-                    AttackPlayer();
-                    yield break; // Exit the coroutine
+                    return true;
                 }
             }
         }
-
-        // If we reach here, the player is not in sight, wait for relocate time duration
-        yield return new WaitForSeconds(relocateTime);
-
-        // Pick another point and repeat the process
-        StartCoroutine(RelocateAndAttack());
+        return false;
+    }
+    public IEnumerator Relocate()
+    {
+        yield return new WaitForSeconds(2.0f);
+        // Calculate random point in range
+        Vector3 randomDirection = Random.insideUnitSphere * walkpointRange;
+        randomDirection += transform.position;
+        NavMeshHit hit;
+        NavMesh.SamplePosition(randomDirection, out hit, walkpointRange, 1);
+        walkpoint = hit.position;
+        agent.SetDestination(walkpoint);
+        Debug.Log("Relocating...");
+        ChangeState(EnemyState.Decision);
     }
 
-
-
-
-    private void FixedUpdate()
+    public IEnumerator ThrowGrenade()
     {
-        if (isRelocating)
+        // Check if a grenade has already been thrown
+        if (isGrenadeThrown)
         {
-            // Attempt to find a new position closer to the player
-            Vector3 newPosition = FindNewPosition();
-            agent.SetDestination(newPosition);
-
-            // Check if the enemy has reached the new position
-            if (Vector3.Distance(transform.position, newPosition) < agent.stoppingDistance)
-            {
-                isRelocating = false;
-            }
-        }
-    }
-
-
-
-
-    // Function to find a new position closer to the player
-    private Vector3 FindNewPosition()
-    {
-        Vector3 newDestination = Vector3.zero;
-        float closestDistanceToPlayer = Mathf.Infinity;
-
-        // Attempt to find a valid position within a radius of 2
-        for (int i = 0; i < 10; i++) // Try 10 times to find a valid position
-        {
-            // Calculate random point within a radius of 2
-            Vector3 randomDirection = Random.insideUnitSphere * 2f;
-            randomDirection += transform.position;
-            NavMeshHit hit;
-
-            if (NavMesh.SamplePosition(randomDirection, out hit, 2f, NavMesh.AllAreas))
-            {
-                // Check if the sampled position is on the NavMesh
-                Vector3 newPosition = hit.position;
-
-                // Calculate distance to the player from the new position
-                float distanceToPlayer = Vector3.Distance(newPosition, player.position);
-
-                // Check if the new position is closer to the player and on the navmesh
-                if (distanceToPlayer < closestDistanceToPlayer)
-                {
-                    // Update closest distance and set new destination
-                    closestDistanceToPlayer = distanceToPlayer;
-                    newDestination = newPosition;
-                }
-            }
+            yield break; // Exit the coroutine if a grenade has already been thrown
         }
 
-        return newDestination;
+        // Set the flag to true to indicate that a grenade is being thrown
+        isGrenadeThrown = true;
+
+        // Instantiate grenade using the grenade GameObject
+        GameObject grenadeInstance = Instantiate(grenade, muzzleTransforms[0].position, Quaternion.identity);
+
+        // Continue making decisions after throwing the grenade
+        Debug.Log("ThrowingGrenade...");
+
+        yield return new WaitForSeconds(3.0f);
+
+        // Reset the flag after the delay to allow throwing another grenade
+        isGrenadeThrown = false;
+        ChangeState(EnemyState.Decision);
     }
 
-    private void ResetAttack()
-    {
-        alreadyAttacked = false;
-    }
 }

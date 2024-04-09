@@ -116,18 +116,18 @@ public class Health : MonoBehaviour
         }
         else
         {
-            // Apply normal damage to health
+            // Apply damage to health directly if not elemental damage
             currentHealth -= damage;
             if (currentHealth <= 0)
-                {
-                    Die();
-                }
-          
+            {
+                Die();
+            }
         }
 
         // Update lastDamageTime to current time
         lastDamageTime = Time.time;
     }
+
 
 
     public IEnumerator DamageOverTimeCoroutine(int damageOverTime, int effectDuration, bool isElementalDamage = false)

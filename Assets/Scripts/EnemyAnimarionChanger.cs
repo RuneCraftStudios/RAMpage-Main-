@@ -4,7 +4,12 @@ public class EnemyAnimationChanger : MonoBehaviour
 {
     private EnemyAiTutorial enemyAi; // Reference to the EnemyAiTutorial script
     [SerializeField] private Animator animator;
-    private float blendTime = 0.2f; // Adjust this value as needed
+
+    private EnemyState currentAnimationState;
+    private EnemyState previousAnimationState;
+
+    [SerializeField] private float blendDuration = 0.1f;
+    private float blendTimer = 0.25f;
 
     void Awake()
     {
@@ -26,40 +31,54 @@ public class EnemyAnimationChanger : MonoBehaviour
 
     void UpdateAnimationState(EnemyState state)
     {
+        // Update previous state before changing current state
+        previousAnimationState = currentAnimationState;
+
+        // Update current state
+        currentAnimationState = state;
+
         // Manipulate animator states based on enemy states
         switch (state)
         {
             case EnemyState.WaitingToBeSpawned:
-                // Play the "WaitingToBeSpawned" animation with blending
-                animator.CrossFade("WaitingToBeSpawned", blendTime);
+                PlayAnimationWithBlend("Patrol");
                 break;
             case EnemyState.Patrol:
-                // Play the "Patrol" animation with blending
-                animator.CrossFade("Patrol", blendTime);
+                PlayAnimationWithBlend("Patrol");
                 break;
             case EnemyState.Chase:
-                // Play the "Chase" animation with blending
-                animator.CrossFade("Chase", blendTime);
+                PlayAnimationWithBlend("Chase");
                 break;
             case EnemyState.Attack:
-                // Play the "Attack" animation with blending
-                animator.CrossFade("Attack", blendTime);
+                PlayAnimationWithBlend("Attack");
                 break;
             case EnemyState.Stun:
-                // Play the "Stun" animation with blending
-                animator.CrossFade("Stun", blendTime);
+                PlayAnimationWithBlend("Stun");
                 break;
             case EnemyState.KnockBack:
-                // Play the "KnockBack" animation with blending
-                animator.CrossFade("KnockBack", blendTime);
+                PlayAnimationWithBlend("KnockBack");
+                break;
+            case EnemyState.ThrowingGrenade:
+                PlayAnimationWithBlend("ThrowGrenade");
+                break;
+            case EnemyState.Relocating:
+                PlayAnimationWithBlend("Patrol");
                 break;
             case EnemyState.Die:
-                // Play the "Die" animation with blending
-                animator.CrossFade("Die", blendTime);
+                PlayAnimationWithBlend("Die");
                 break;
             default:
                 // Handle any other states if needed
                 break;
         }
+    }
+
+    void PlayAnimationWithBlend(string animationName)
+    {
+        if (currentAnimationState != previousAnimationState)
+        {
+            animator.CrossFadeInFixedTime(animationName, blendTimer);
+        }
+       
     }
 }

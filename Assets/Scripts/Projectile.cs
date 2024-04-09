@@ -17,18 +17,10 @@ public class Projectile : MonoBehaviour
     [SerializeField] private LayerMask explosionLayers;
     [SerializeField] private GameObject explosionParticles;
 
-    [Header("Trail Settings")]
-    public bool useTrail = false;
-    public float trailWidth = 0.2f;
-    public float trailDuration = 1f;
-    public Color trailColor = Color.white;
-    public Material trailMaterial;
-
     [Header("Target Layer")]
     public LayerMask targetLayer; // New variable for target layer
 
     private float distanceTraveled = 0f;
-    private TrailRenderer trailRenderer;
 
     void Start()
     {
@@ -39,16 +31,6 @@ public class Projectile : MonoBehaviour
         if (rb != null)
         {
             rb.velocity = randomDirection * speed;
-        }
-
-        if (useTrail)
-        {
-            trailRenderer = gameObject.AddComponent<TrailRenderer>();
-            trailRenderer.startWidth = trailWidth;
-            trailRenderer.endWidth = trailWidth;
-            trailRenderer.time = trailDuration;
-            trailRenderer.material = trailMaterial;
-            trailRenderer.material.color = trailColor;
         }
     }
 

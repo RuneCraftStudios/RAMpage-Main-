@@ -6,25 +6,25 @@ using TMPro;
 public class EnemyHealth : MonoBehaviour
 {
     [Header("Main Parameters")]
-    public int maxHealth = 100; // Maximum health of the GameObject
-    public int maxShield = 100; // Maximum shield of the GameObject
-    public int maxEnergy = 100; // Maximum energy of the player
-    public float rechargeDelay = 2f; // Time delay before shield starts recharging after taking damage
-    public float shieldRechargeRate = 5f; // Shield recharge rate per second
+    public int maxHealth = 100;
+    public int maxShield = 100;
+    public int maxEnergy = 100;
+    public float rechargeDelay = 2f;
+    public float shieldRechargeRate = 5f;
 
     [Header("Status")]
-    [SerializeField] private int currentHealth; // Current health of the GameObject
-    [SerializeField] private int currentShield; // Current shield of the GameObject
-    [SerializeField] private int currentEnergy; // Current energy of the GameObject
-    private float lastDamageTime; // Time when the last damage was taken
-    private float currentRechargeAmount; // Accumulated recharge amount for the shield
-    [SerializeField] private bool isElectrified = false; // Indicates if the target is electrified
-    [SerializeField] private bool isIgnited = false; // Indicates if the target is ignited
+    [SerializeField] private int currentHealth;
+    [SerializeField] private int currentShield;
+    [SerializeField] private int currentEnergy;
+    private float lastDamageTime;
+    private float currentRechargeAmount;
+    [SerializeField] private bool isElectrified = false;
+    [SerializeField] private bool isIgnited = false;
 
     [Header("EnemyUISettings")]
-    public GameObject BaseDamageUI; // Reference to the damage number prefab
-    public GameObject ElectricityDamageUI; //Reference to the electric damage number prefab
-    public GameObject FireDamageUI; //Reference to the fire damage number prefab
+    public TextMeshPro baseDamageText; // Assign the TextMeshPro component for base damage
+    public TextMeshPro electricityDamageText; // Assign the TextMeshPro component for electricity damage
+    public TextMeshPro fireDamageText; // Assign the TextMeshPro component for fire damage
     [SerializeField] private float textDisappearTime = 2f;
     [SerializeField] private float DeathAnimationTime;
 
@@ -32,13 +32,14 @@ public class EnemyHealth : MonoBehaviour
     private Queue<int> damageQueue = new Queue<int>();
 
     public EnemyAiTutorial enemyAi;
+
     // Inside your Awake() method
     private void Awake()
     {
-        currentHealth = maxHealth; // Initialize current health to max health
-        currentShield = maxShield; // Initialize current shield to max shield
-        currentEnergy = maxEnergy; // Initialize current energy to max energy
-        lastDamageTime = Time.time; // Initialize lastDamageTime to current time
+        currentHealth = maxHealth;
+        currentShield = maxShield;
+        currentEnergy = maxEnergy;
+        lastDamageTime = Time.time;
         isElectrified = false;
         isIgnited = false;
     }
@@ -103,11 +104,10 @@ public class EnemyHealth : MonoBehaviour
 
     public void TakeDamage(int damage, bool applyToShield = false, bool isElementalDamage = false, float effectDuration = 0f, int damageOverTime = 0, float effectChance = 0f)
     {
-        if (applyToShield)
+        if (applyToShield && currentShield > 0)
         {
             if (!isElementalDamage)
             {
-                // Normal damage to shields
                 currentShield -= damage;
                 if (currentShield < 0)
                 {
@@ -117,17 +117,18 @@ public class EnemyHealth : MonoBehaviour
         }
         else
         {
-            // Apply normal damage to health
             currentHealth -= damage;
             if (currentHealth <= 0)
-                
-                    enemyAi.ChangeState(EnemyState.Die);
+            {
+                enemyAi.ChangeState(EnemyState.Die);
+            }
         }
 
-        // Update lastDamageTime to current time
         lastDamageTime = Time.time;
-        SpawnDamageNumber(damage);
+        SpawnDamageNumber(damage, transform, !isElementalDamage);
     }
+
+
 
 
     public IEnumerator DamageOverTimeCoroutine(int damageOverTime, int effectDuration, bool isElementalDamage = false)
@@ -162,7 +163,7 @@ public class EnemyHealth : MonoBehaviour
             }
 
 
-            SpawnDamageNumber(damageOverTime);
+            SpawnDamageNumber(damageOverTime, transform, isElementalDamage);
             timer += 1f; // Increment timer by 1 second
             yield return new WaitForSeconds(1f);
         }
@@ -198,57 +199,54 @@ public class EnemyHealth : MonoBehaviour
         // Increase current energy by the specified amount
         currentEnergy = Mathf.Min(currentEnergy + (int)amount, maxEnergy);
     }
-    void SpawnDamageNumber(int damage, bool isElemental = false)
+    void SpawnDamageNumber(int damage, Transform targetTransform, bool isElemental = false)
     {
-        // Check if the GameObject is an enemy and if the damage number prefab is assigned
-       
-            GameObject damageNumberPrefab;
+        TextMeshPro damageTextPrefab;
 
-
-            // Check if the target is electrified or ignited
+        // Select the appropriate damage number prefab based on elemental type
+        if (isElemental)
+        {
             if (IsElectrified)
             {
-                damageNumberPrefab = ElectricityDamageUI; // Use ElectricityDamageUI prefab
+                damageTextPrefab = electricityDamageText;
             }
             else if (IsIgnited)
             {
-                damageNumberPrefab = FireDamageUI; // Use FireDamageUI prefab
+                damageTextPrefab = fireDamageText;
             }
             else
             {
-                damageNumberPrefab = BaseDamageUI; // Use BaseDamageUI prefab as default
-            }
-
-
-
-            // Check if the damage number prefab is assigned
-            if (damageNumberPrefab != null)
-            {
-                // Instantiate the damage number prefab at the exact position
-                GameObject damageNumberObject = Instantiate(damageNumberPrefab, damageNumberPrefab.transform.position, Quaternion.identity);
-
-                // Get the TextMeshPro component from the child object of damageNumberObject
-                TextMeshPro damageText = damageNumberObject.GetComponentInChildren<TextMeshPro>();
-
-                // Set the damage number text to display the damage value
-                if (damageText != null)
-                {
-                    damageText.text = damage.ToString();
-                }
-                else
-                {
-                    Debug.LogError("TextMeshPro component not found in the child object of damageNumberPrefab.");
-                }
-
-                // Remove the damage number text after a certain time
-                Destroy(damageNumberObject, textDisappearTime);
-            }
-            else
-            {
-                Debug.LogError("Damage number prefab is not assigned or GameObject is not an enemy.");
+                damageTextPrefab = baseDamageText;
             }
         }
-    
+        else
+        {
+            damageTextPrefab = baseDamageText;
+        }
+
+        if (damageTextPrefab != null)
+        {
+            // Instantiate the damage number prefab at the position of the target TextMeshPro component
+            TextMeshPro damageText = Instantiate(damageTextPrefab, damageTextPrefab.transform.position, Quaternion.identity);
+
+            // Set the parent of the instantiated damage text to maintain hierarchy
+            damageText.transform.SetParent(damageTextPrefab.transform.parent);
+
+            // Set the damage number text to display the damage value
+            damageText.text = damage.ToString();
+
+            // Remove the damage number text after a certain time
+            Destroy(damageText.gameObject, textDisappearTime);
+        }
+        else
+        {
+            Debug.LogError("Damage number prefab is not assigned.");
+        }
+    }
+
+
+
+
 
     // Accessors for current health, shield, and energy
     public int CurrentHealth

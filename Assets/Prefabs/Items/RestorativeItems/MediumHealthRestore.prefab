@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6192470342422215500}
   - component: {fileID: 2767729335343676360}
   m_Layer: 13
-  m_Name: LowHealthRestore
+  m_Name: MediumHealthRestore
   m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,8 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43ad5e7ba7ee1e34d8f1486dad6acca5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemName: LowHealthRestore
-  healthRestoreAmount: 5
+  itemName: MediumHealthRestore
+  healthRestoreAmount: 10
   shieldRestoreAmount: 0
   energyRestoreAmount: 0
 --- !u!135 &2767729335343676360
@@ -97,13 +97,13 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 7429267731588047758}
+  - {fileID: 7991099768855373003}
   m_Father: {fileID: 3541728882484629472}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &5185025377152954901
+--- !u!1001 &5623008423727674704
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -171,9 +171,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3afb9da04c930146aba663920a1b57d, type: 3}
---- !u!4 &7429267731588047758 stripped
+--- !u!4 &7991099768855373003 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2373087732659753371, guid: c3afb9da04c930146aba663920a1b57d,
     type: 3}
-  m_PrefabInstance: {fileID: 5185025377152954901}
+  m_PrefabInstance: {fileID: 5623008423727674704}
   m_PrefabAsset: {fileID: 0}

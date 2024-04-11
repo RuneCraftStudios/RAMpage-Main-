@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Projectile : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class Projectile : MonoBehaviour
 
     void Start()
     {
+
         Vector3 randomRotation = Random.insideUnitSphere * accuracy;
         Vector3 randomDirection = Quaternion.Euler(randomRotation) * transform.forward;
 
@@ -32,6 +34,7 @@ public class Projectile : MonoBehaviour
         {
             rb.velocity = randomDirection * speed;
         }
+
     }
 
     void Update()
@@ -46,32 +49,46 @@ public class Projectile : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (((1 << other.gameObject.layer) & targetLayer) != 0) // Check if the collided GameObject's layer is in targetLayer
+        Debug.Log("Collision Occurred");
+        if (((1 << other.gameObject.layer) & targetLayer) != 0)
         {
-            Health targetHealth = other.GetComponent<Health>();
-            if (targetHealth != null)
-            {
-                if (targetHealth.CurrentShield > 0)
-                {
-                    targetHealth.TakeDamage(damage, applyToShield: true);
-                }
-                else
-                {
-                    targetHealth.TakeDamage(damage);
-                }
-            }
+            Health playerHealth = null;
+            EnemyHealth enemyHealth = null;
 
+            // Check if the collided GameObject is the player
+            if (targetLayer == (targetLayer | (1 << other.gameObject.layer)) && other.gameObject.CompareTag("Player"))
+            {
+                Debug.Log("Player Identified");
+                playerHealth = other.GetComponent<Health>();
+                playerHealth.TakeDamage(damage);
+            }
+            // Check if the collided GameObject is an enemy
+            else if (targetLayer == (targetLayer | (1 << other.gameObject.layer)) && other.gameObject.CompareTag("Enemy"))
+            {
+                enemyHealth = other.GetComponent<EnemyHealth>();
+                enemyHealth.TakeDamage(damage);
+            }
+            // Check if explosion is enabled, and destroy the projectile accordingly
             if (explodeOnCollision)
             {
                 Explode();
             }
             else
             {
-                Destroy(gameObject);
+                DestroyProjectile();
             }
+        }
+        // Destroy the projectile if it collides with any other object
+        else
+        {
+            DestroyProjectile();
         }
     }
 
+    void DestroyProjectile()
+    {
+        Destroy(gameObject);
+    }
     private void Explode()
     {
         if (explodeOnCollision)

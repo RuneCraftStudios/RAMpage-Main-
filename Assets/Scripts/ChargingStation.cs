@@ -77,7 +77,7 @@ public class ChargeStation : MonoBehaviour
             playerInside = true;
             playerOutside = false;
             StartSpawning(); // Start spawning items when player enters the collider
-            Debug.Log("PlayerInside bool set to true.");
+            //Debug.Log("PlayerInside bool set to true.");
 
         }
     }
@@ -122,7 +122,7 @@ public class ChargeStation : MonoBehaviour
 
         while (currentCapacity < maxCapacity && continueRegeneration) // Check continueRegeneration flag
         {
-            Debug.Log("Start of regeneration process. Current capacity: " + currentCapacity);
+            //Debug.Log("Start of regeneration process. Current capacity: " + currentCapacity);
 
             // Update currentCapacity by the regenRate
             currentCapacity += (int)regenRate;
@@ -135,7 +135,7 @@ public class ChargeStation : MonoBehaviour
             {
                 currentCapacity = maxCapacity;
                 // Station is fully charged
-                Debug.Log("Station is fully charged. Current capacity: " + currentCapacity);
+                //Debug.Log("Station is fully charged. Current capacity: " + currentCapacity);
                 animator.SetBool("RegenProcessActive", false);
                 regenProcessActive = false;
                 break; // Exit the loop

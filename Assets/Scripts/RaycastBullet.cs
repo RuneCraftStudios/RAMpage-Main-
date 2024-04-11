@@ -57,7 +57,7 @@ public class RaycastBullet : MonoBehaviour
                 if (targetHealth.CurrentShield > 0)
                 {
                     // Deal damage to shields
-                    targetHealth.TakeDamage((int)damage, applyToShield: true);
+                    targetHealth.TakeDamage((int)damage);
                 }
                 else
                 {

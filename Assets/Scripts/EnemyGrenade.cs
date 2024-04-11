@@ -43,7 +43,7 @@ public class EnemyGrenade : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (((1 << other.gameObject.layer) & explosionLayers) != 0)
+        if (other.gameObject.layer == explosionLayers)
         {
             Explode();
         }
@@ -52,14 +52,7 @@ public class EnemyGrenade : MonoBehaviour
             Health targetHealth = other.GetComponent<Health>();
             if (targetHealth != null)
             {
-                if (targetHealth.CurrentShield > 0)
-                {
-                    targetHealth.TakeDamage(explosionDamage, applyToShield: true);
-                }
-                else
-                {
-                    targetHealth.TakeDamage(explosionDamage);
-                }
+                targetHealth.TakeDamage(explosionDamage);
             }
             Explode();
         }

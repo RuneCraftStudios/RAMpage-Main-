@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine.XR;
 
 public class EnemyHealth : MonoBehaviour
 {
@@ -18,20 +19,29 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField] private int currentEnergy;
     private float lastDamageTime;
     private float currentRechargeAmount;
-    [SerializeField] private bool isElectrified = false;
-    [SerializeField] private bool isIgnited = false;
-
-    [Header("EnemyUISettings")]
-    public TextMeshPro baseDamageText; // Assign the TextMeshPro component for base damage
-    public TextMeshPro electricityDamageText; // Assign the TextMeshPro component for electricity damage
-    public TextMeshPro fireDamageText; // Assign the TextMeshPro component for fire damage
-    [SerializeField] private float textDisappearTime = 2f;
+    private Coroutine damageOverTimeCoroutine = null;
     [SerializeField] private float DeathAnimationTime;
 
-    // Queue to store incoming damage messages
-    private Queue<int> damageQueue = new Queue<int>();
+    [Header("Audio")]
+    [SerializeField] private AudioSource AudioSource;
+    [SerializeField] private AudioClip TakeDamageClip;
 
+    private Coroutine electrifiedCoroutine;
+    private Coroutine ignitedCoroutine;
+    private Queue<int> damageQueue = new Queue<int>();
     public EnemyAiTutorial enemyAi;
+    public int CurrentHealth
+    {
+        get { return currentHealth; }
+    }
+    public int CurrentShield
+    {
+        get { return currentShield; }
+    }
+    public int CurrentEnergy
+    {
+        get { return currentEnergy; }
+    }
 
     // Inside your Awake() method
     private void Awake()
@@ -40,27 +50,12 @@ public class EnemyHealth : MonoBehaviour
         currentShield = maxShield;
         currentEnergy = maxEnergy;
         lastDamageTime = Time.time;
-        isElectrified = false;
-        isIgnited = false;
     }
-
-    public bool IsElectrified
-    {
-        get { return isElectrified; }
-        set { isElectrified = value; }
-    }
-
-    public bool IsIgnited
-    {
-        get { return isIgnited; }
-        set { isIgnited = value; }
-    }
-
     private void Update()
     {
 
-        // Check if the shield needs to be recharged
-        if (!isElectrified && !isIgnited && currentShield < maxShield && Time.time > lastDamageTime + rechargeDelay && damageQueue.Count == 0)
+        // Modify the shield recharge condition to check for !isDamageOverTimeActive and healthUnchanged
+        if (currentShield < maxShield && Time.time > lastDamageTime + rechargeDelay && damageQueue.Count == 0)
         {
             // Accumulate recharge amount
             currentRechargeAmount += shieldRechargeRate * Time.deltaTime;
@@ -80,43 +75,26 @@ public class EnemyHealth : MonoBehaviour
             TakeDamage(damage);
         }
     }
-
-
-    public bool IsElementalEffectActive()
-    {
-        // Check if the enemy is electrified
-        bool isElectrified = GetComponent<ElementalEffect>() != null && GetComponent<ElementalEffect>().elementType == ElementalEffect.ElementType.Electricity;
-
-        // Check if the enemy is ignited
-        bool isIgnited = GetComponent<ElementalEffect>() != null && GetComponent<ElementalEffect>().elementType == ElementalEffect.ElementType.Fire;
-
-        // Return true if either the enemy is electrified or ignited
-        return isElectrified || isIgnited;
-    }
-
-
-
     public void QueueDamage(int damage)
     {
         // Add incoming damage to the queue
         damageQueue.Enqueue(damage);
     }
 
-    public void TakeDamage(int damage, bool applyToShield = false, bool isElementalDamage = false, float effectDuration = 0f, int damageOverTime = 0, float effectChance = 0f)
+    public void TakeDamage(int damage)
     {
-        if (applyToShield && currentShield > 0)
+        if (currentShield > 0)
         {
-            if (!isElementalDamage)
+            // Apply damage to shield
+            currentShield -= damage;
+            if (currentShield < 0)
             {
-                currentShield -= damage;
-                if (currentShield < 0)
-                {
-                    currentShield = 0;
-                }
+                currentShield = 0;
             }
         }
         else
         {
+            // Apply damage to health directly
             currentHealth -= damage;
             if (currentHealth <= 0)
             {
@@ -124,64 +102,47 @@ public class EnemyHealth : MonoBehaviour
             }
         }
 
+        // Update lastDamageTime to current time
         lastDamageTime = Time.time;
-        SpawnDamageNumber(damage, transform, !isElementalDamage);
+
+        // Apply elemental effects
+
+        AudioSource.PlayOneShot(TakeDamageClip);
     }
 
 
 
 
-    public IEnumerator DamageOverTimeCoroutine(int damageOverTime, int effectDuration, bool isElementalDamage = false)
+    public void StartDamageOverTime(int damagePerSecond, float duration)
     {
-        enemyAi.ChangeState(EnemyState.Stun);
-
+        // If there's an ongoing DoT effect, stop it first to reset
+        damageOverTimeCoroutine = StartCoroutine(DamageOverTimeCoroutine(damagePerSecond, duration));
+    }
+    private IEnumerator DamageOverTimeCoroutine(int damageOverTime, float effectDuration)
+    {
         float timer = 0f;
 
         while (timer < effectDuration)
         {
-            // Check if shields are present
-            if (currentShield > 0)
-            {
-                // Apply damage over time to shields
-                currentShield -= damageOverTime;
+            
+            // Apply damage over time
+            TakeDamage(damageOverTime); // Using TakeDamage ensures shield/health logic is centralized
 
-                if (currentShield < 0)
-                {
-                    currentShield = 0;
-                }
-            }
-            else
-            {
-                // If no shields, apply damage over time to health
-                currentHealth -= damageOverTime;
-                if (currentHealth <= 0)
-                {
-                    
-                        enemyAi.ChangeState(EnemyState.Die);
-                    yield break; // Exit the coroutine if health reaches zero
-                }
-            }
-
-
-            SpawnDamageNumber(damageOverTime, transform, isElementalDamage);
-            timer += 1f; // Increment timer by 1 second
+            timer += 1f; // Assuming damage is applied every second
             yield return new WaitForSeconds(1f);
         }
+
+        // Reset coroutine reference when done
+        damageOverTimeCoroutine = null;
     }
-
-
-    public IEnumerator DisableElectrifiedEffect(int duration)
+    public void StopDamageOverTime()
     {
-        yield return new WaitForSeconds(duration);
-        isElectrified = false; // Disable electrified effect after duration ends
+        if (damageOverTimeCoroutine != null)
+        {
+            StopCoroutine(damageOverTimeCoroutine);
+            damageOverTimeCoroutine = null;
+        }
     }
-    public IEnumerator DisableIgnitedEffect(int duration)
-    {
-        yield return new WaitForSeconds(duration);
-        isIgnited = false; // Disable ignited effect after duration ends
-    }
-
-
     public void RestoreHealth(int amount)
     {
         // Increase current health by the specified amount
@@ -198,69 +159,5 @@ public class EnemyHealth : MonoBehaviour
     {
         // Increase current energy by the specified amount
         currentEnergy = Mathf.Min(currentEnergy + (int)amount, maxEnergy);
-    }
-    void SpawnDamageNumber(int damage, Transform targetTransform, bool isElemental = false)
-    {
-        TextMeshPro damageTextPrefab;
-
-        // Select the appropriate damage number prefab based on elemental type
-        if (isElemental)
-        {
-            if (IsElectrified)
-            {
-                damageTextPrefab = electricityDamageText;
-            }
-            else if (IsIgnited)
-            {
-                damageTextPrefab = fireDamageText;
-            }
-            else
-            {
-                damageTextPrefab = baseDamageText;
-            }
-        }
-        else
-        {
-            damageTextPrefab = baseDamageText;
-        }
-
-        if (damageTextPrefab != null)
-        {
-            // Instantiate the damage number prefab at the position of the target TextMeshPro component
-            TextMeshPro damageText = Instantiate(damageTextPrefab, damageTextPrefab.transform.position, Quaternion.identity);
-
-            // Set the parent of the instantiated damage text to maintain hierarchy
-            damageText.transform.SetParent(damageTextPrefab.transform.parent);
-
-            // Set the damage number text to display the damage value
-            damageText.text = damage.ToString();
-
-            // Remove the damage number text after a certain time
-            Destroy(damageText.gameObject, textDisappearTime);
-        }
-        else
-        {
-            Debug.LogError("Damage number prefab is not assigned.");
-        }
-    }
-
-
-
-
-
-    // Accessors for current health, shield, and energy
-    public int CurrentHealth
-    {
-        get { return currentHealth; }
-    }
-
-    public int CurrentShield
-    {
-        get { return currentShield; }
-    }
-
-    public int CurrentEnergy
-    {
-        get { return currentEnergy; }
     }
 }

@@ -19,39 +19,38 @@ public class Health : MonoBehaviour
     public bool ConsumeEnergy; // Bool to test energy depletion
     private float lastDamageTime; // Time when the last damage was taken
     private float currentRechargeAmount; // Accumulated recharge amount for the shield
-    [SerializeField] private bool isElectrified = false; // Indicates if the target is electrified
-    [SerializeField] private bool isIgnited = false; // Indicates if the target is ignited
- 
+
+    private Coroutine damageOverTimeCoroutine = null;
     private GameManager GameManager;
     private Queue<int> damageQueue = new Queue<int>();
-    // Inside your Awake() method
+    
+
     private void Awake()
     {
         currentHealth = maxHealth; // Initialize current health to max health
         currentShield = maxShield; // Initialize current shield to max shield
         currentEnergy = maxEnergy; // Initialize current energy to max energy
         lastDamageTime = Time.time; // Initialize lastDamageTime to current time
-        isElectrified = false;
-        isIgnited = false;
+    }
+    public int CurrentHealth
+    {
+        get { return currentHealth; }
     }
 
-    public bool IsElectrified
+    public int CurrentShield
     {
-        get { return isElectrified; }
-        set { isElectrified = value; }
+        get { return currentShield; }
     }
 
-    public bool IsIgnited
+    public int CurrentEnergy
     {
-        get { return isIgnited; }
-        set { isIgnited = value; }
+        get { return currentEnergy; }
     }
 
     private void Update()
     {
-        
-        // Check if the shield needs to be recharged
-        if (!isElectrified && !isIgnited && currentShield < maxShield && Time.time > lastDamageTime + rechargeDelay && damageQueue.Count == 0)
+        // Modify the shield recharge condition to check for !isDamageOverTimeActive and healthUnchanged
+        if (currentShield < maxShield && Time.time > lastDamageTime + rechargeDelay && damageQueue.Count == 0)
         {
             // Accumulate recharge amount
             currentRechargeAmount += shieldRechargeRate * Time.deltaTime;
@@ -78,45 +77,26 @@ public class Health : MonoBehaviour
             ConsumeEnergy = false; // Reset testDepleteEnergy
         }
     }
-
-
-    public bool IsElementalEffectActive()
-    {
-        // Check if the enemy is electrified
-        bool isElectrified = GetComponent<ElementalEffect>() != null && GetComponent<ElementalEffect>().elementType == ElementalEffect.ElementType.Electricity;
-
-        // Check if the enemy is ignited
-        bool isIgnited = GetComponent<ElementalEffect>() != null && GetComponent<ElementalEffect>().elementType == ElementalEffect.ElementType.Fire;
-
-        // Return true if either the enemy is electrified or ignited
-        return isElectrified || isIgnited;
-    }
-
-
-
     public void QueueDamage(int damage)
     {
         // Add incoming damage to the queue
         damageQueue.Enqueue(damage);
     }
 
-    public void TakeDamage(int damage, bool applyToShield = false, bool isElementalDamage = false, float effectDuration = 0f, int damageOverTime = 0, float effectChance = 0f)
+    public void TakeDamage(int damage)
     {
-        if (applyToShield)
+        if (currentShield > 0)
         {
-            if (!isElementalDamage)
+            // Apply damage to shield
+            currentShield -= damage;
+            if (currentShield < 0)
             {
-                // Normal damage to shields
-                currentShield -= damage;
-                if (currentShield < 0)
-                {
-                    currentShield = 0;
-                }
+                currentShield = 0;
             }
         }
         else
         {
-            // Apply damage to health directly if not elemental damage
+            // Apply damage to health directly
             currentHealth -= damage;
             if (currentHealth <= 0)
             {
@@ -126,57 +106,39 @@ public class Health : MonoBehaviour
 
         // Update lastDamageTime to current time
         lastDamageTime = Time.time;
+
+        // Apply elemental effects
+        
     }
-
-
-
-    public IEnumerator DamageOverTimeCoroutine(int damageOverTime, int effectDuration, bool isElementalDamage = false)
+    public void StartDamageOverTime(int damagePerSecond, float duration)
     {
-
+        // If there's an ongoing DoT effect, stop it first to reset
+        damageOverTimeCoroutine = StartCoroutine(DamageOverTimeCoroutine(damagePerSecond, duration));
+    }
+    private IEnumerator DamageOverTimeCoroutine(int damageOverTime, float effectDuration)
+    {
         float timer = 0f;
 
         while (timer < effectDuration)
         {
-            // Check if shields are present
-            if (currentShield > 0)
-            {
-                // Apply damage over time to shields
-                currentShield -= damageOverTime;
+            // Apply damage over time
+            TakeDamage(damageOverTime); // Using TakeDamage ensures shield/health logic is centralized
 
-                if (currentShield < 0)
-                {
-                    currentShield = 0;
-                }
-            }
-            else
-            {
-                // If no shields, apply damage over time to health
-                currentHealth -= damageOverTime;
-                if (currentHealth <= 0)
-                {
-                    
-                    Die();
-                    
-                    yield break; // Exit the coroutine if health reaches zero
-                }
-            }
-            timer += 1f; // Increment timer by 1 second
+            timer += 1f; // Assuming damage is applied every second
             yield return new WaitForSeconds(1f);
         }
-    }
-    
 
-    public IEnumerator DisableElectrifiedEffect(int duration)
-    {
-        yield return new WaitForSeconds(duration);
-        isElectrified = false; // Disable electrified effect after duration ends
+        // Reset coroutine reference when done
+        damageOverTimeCoroutine = null;
     }
-    public IEnumerator DisableIgnitedEffect(int duration)
+    public void StopDamageOverTime()
     {
-        yield return new WaitForSeconds(duration);
-        isIgnited = false; // Disable ignited effect after duration ends
+        if (damageOverTimeCoroutine != null)
+        {
+            StopCoroutine(damageOverTimeCoroutine);
+            damageOverTimeCoroutine = null;
+        }
     }
-
 
     public void RestoreHealth(int amount)
     {
@@ -198,23 +160,10 @@ public class Health : MonoBehaviour
 
     void Die()
     {
-            GameManager.instance.PlayerDied();
+       GameManager.instance.PlayerDied();
+        StopDamageOverTime();
     }
     // Accessors for current health, shield, and energy
-    public int CurrentHealth
-    {
-        get { return currentHealth; }
-    }
-
-    public int CurrentShield
-    {
-        get { return currentShield; }
-    }
-
-    public int CurrentEnergy
-    {
-        get { return currentEnergy; }
-    }
 
     // Method to deplete energy (for testing purposes)
     public void DepleteEnergy(int amount)

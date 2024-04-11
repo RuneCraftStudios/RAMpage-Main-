@@ -168,11 +168,8 @@ public class EnemyAiTutorial : MonoBehaviour
                 attackRange = 0;    
                 StartCoroutine(DieAfterBufferTime());
                 break;
-                
-
         }
     }
-
     public void ChangeState(EnemyState newState)
     {
         currentState = newState;
@@ -281,9 +278,6 @@ public class EnemyAiTutorial : MonoBehaviour
             ChangeState(EnemyState.Decision);
         }
     }
-
-
-
     public void MakeDecision()
     {
         if (playerInAttackRange== true)
@@ -544,19 +538,14 @@ public class EnemyAiTutorial : MonoBehaviour
 
         return playerSeen; // Return the playerSeen flag
     }
-
     protected void RotateTowardsPlayer()
     {
         agent.SetDestination(player.position);
     }
-
-
-
     private IEnumerator RecoverFromKnockBack()
     {
         yield return new WaitForSeconds(2.0f);
         agent.isStopped = false;
         ChangeState(EnemyState.Decision);
     }
-   
 }

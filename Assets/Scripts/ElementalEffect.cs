@@ -10,7 +10,9 @@ public class ElementalEffect : MonoBehaviour
     [Range(0f, 1f)]
     public float effectChance = 1f; // Chance of elemental effect (100%)
 
-    private Health targetHealth; // Reference to target's Health component
+    // References to Health components
+    private Health playerHealth;
+    private EnemyHealth enemyHealth; // Assume you have an EnemyHealth script similar to Health
 
     // Method to simulate OnTriggerEnter for raycasts
     public void RaycastCollision(Vector3 hitPoint)
@@ -19,67 +21,70 @@ public class ElementalEffect : MonoBehaviour
         Collider[] colliders = Physics.OverlapSphere(hitPoint, 0.1f);
         foreach (Collider collider in colliders)
         {
-            // Get the Health component of the collided GameObject
-            targetHealth = collider.GetComponent<Health>();
-            if (targetHealth != null)
-            {
-                // Check if elemental effect can be applied
-                if (Random.value <= effectChance)
-                {
-                    if (elementType == ElementType.Fire && targetHealth.CurrentShield == 0)
-                    {
-                        // Apply Ignite effect
-                        ApplyElementalEffect();
-                    }
-                    else if (elementType == ElementType.Electricity)
-                    {
-                        // Apply Electrify effect
-                        ApplyElementalEffect();
-                    }
-                }
-            }
+            ApplyEffectBasedOnTag(collider);
         }
     }
 
     // Called when the projectile collides with another collider
     void OnTriggerEnter(Collider other)
     {
-        // Get the Health component of the collided GameObject
-        targetHealth = other.GetComponent<Health>();
+        ApplyEffectBasedOnTag(other);
+    }
 
-        if (targetHealth != null)
+    // Method to apply elemental effect based on tag
+    private void ApplyEffectBasedOnTag(Collider collider)
+    {
+        if (collider.CompareTag("Player"))
         {
-            // Check if elemental effect can be applied
-            if (Random.value <= effectChance)
-            {
-                if (elementType == ElementType.Fire && targetHealth.CurrentShield == 0)
-                {
-                    // Apply Ignite effect
-                    ApplyElementalEffect();
-                }
-                else if (elementType == ElementType.Electricity)
-                {
-                    // Apply Electrify effect
-                    ApplyElementalEffect();
-                }
-            }
+            playerHealth = collider.GetComponent<Health>();
+            ApplyEffectToHealth(playerHealth);
+        }
+        else if (collider.CompareTag("Enemy"))
+        {
+            enemyHealth = collider.GetComponent<EnemyHealth>();
+            ApplyEffectToEnemyHealth(enemyHealth);
         }
     }
 
     // Method to apply elemental effect
-    public void ApplyElementalEffect()
+    private void ApplyElementalEffect()
     {
-        if (elementType == ElementType.Fire)
+        if (elementType == ElementType.Fire || elementType == ElementType.Electricity)
         {
-            targetHealth.IsIgnited = true; // Set the IsIgnited boolean to true
-            targetHealth.StartCoroutine(targetHealth.DamageOverTimeCoroutine(damageOverTime, Mathf.RoundToInt(effectDuration))); // Cast effectDuration to int
-            targetHealth.StartCoroutine(targetHealth.DisableIgnitedEffect(Mathf.RoundToInt(effectDuration))); // Cast effectDuration to int
+            // This method is kept generic for both player and enemy
+            // Directly start DamageOverTime
+            if (playerHealth != null)
+            {
+                playerHealth.StartDamageOverTime(damageOverTime, effectDuration);
+            }
+            else if (enemyHealth != null)
+            {
+                enemyHealth.StartDamageOverTime(damageOverTime, effectDuration);
+            }
         }
-        else if (elementType == ElementType.Electricity)
+    }
+
+    // Apply the effect if conditions are met and clear health references
+    private void ApplyEffectToHealth(Health healthComponent)
+    {
+        if (healthComponent != null && Random.value <= effectChance)
         {
-            targetHealth.IsElectrified = true; // Set the IsElectrified boolean to true
-            targetHealth.StartCoroutine(targetHealth.DamageOverTimeCoroutine(damageOverTime, Mathf.RoundToInt(effectDuration))); // Cast effectDuration to int
-            targetHealth.StartCoroutine(targetHealth.DisableElectrifiedEffect(Mathf.RoundToInt(effectDuration))); // Cast effectDuration to int
+            if ((elementType == ElementType.Fire && healthComponent.CurrentShield == 0) || elementType == ElementType.Electricity)
+            {
+                ApplyElementalEffect();
+            }
         }
+        playerHealth = null; // Clear reference
+    }
+
+    // Similar to ApplyEffectToHealth but for enemy health component
+    private void ApplyEffectToEnemyHealth(EnemyHealth enemyHealthComponent)
+    {
+        if (enemyHealthComponent != null && Random.value <= effectChance)
+        {
+            // Assume enemy health has similar functionality or adapt as needed
+            ApplyElementalEffect();
+        }
+        enemyHealth = null; // Clear reference
     }
 }

@@ -7,8 +7,6 @@ public class EnemyAnimationChanger : MonoBehaviour
 
     private EnemyState currentAnimationState;
     private EnemyState previousAnimationState;
-
-    [SerializeField] private float blendDuration = 0.1f;
     private float blendTimer = 0.25f;
 
     void Awake()

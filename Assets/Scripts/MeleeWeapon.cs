@@ -11,7 +11,6 @@ public class MeleeWeapon : MonoBehaviour
     [SerializeField] private bool IsHeavy;
     [SerializeField] private float knockbackForce;
     [SerializeField] private float knockbackbuffer;
-    public EnemyAiTutorial enemyAi;
 
 
     private void Start()
@@ -22,48 +21,60 @@ public class MeleeWeapon : MonoBehaviour
     // Called when the trigger collider attached to the weapon GameObject overlaps with another collider
     private void OnTriggerEnter(Collider other)
     {
-        // Check if the collider belongs to any of the layers specified in the LayerMask
-        if (((1 << other.gameObject.layer) & targetLayers) != 0)
+        if (((1 << other.gameObject.layer) & targetLayers) == 0) return; // Early exit if the object isn't in the target layer
+
+        if (other.CompareTag("Enemy"))
         {
-            // Check if the collider or its parent GameObject has a Health component
+            // Logic for when hitting an enemy
             EnemyHealth targetHealth = other.GetComponentInParent<EnemyHealth>();
-
-
             if (targetHealth != null && canDealDamage)
             {
-                // Apply damage to the collided GameObject's Health component
                 targetHealth.TakeDamage(damage);
-                if (IsHeavy)
-                {
-                    // Find the EnemyAiTutorial component on the root GameObject of the collider
-                    EnemyAiTutorial enemyAi = other.GetComponentInParent<EnemyAiTutorial>();
-
-                    // If EnemyAiTutorial component is found, proceed with knockback
-                    if (enemyAi != null)
-                    {
-                        // Calculate the knockback direction
-                        Vector3 knockbackDirection = (other.transform.position - transform.position).normalized;
-
-                        // Apply knockback force in the opposite direction
-                        Rigidbody enemyRigidbody = other.GetComponentInParent<Rigidbody>();
-                        if (enemyRigidbody != null)
-                        {
-                            enemyRigidbody.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
-                            enemyAi.KnockBack();
-                        }
-                    }
-                }
-                canDealDamage = false; // Disable dealing damage temporarily
-                weaponCollider.enabled = false; // Deactivate the collider
-                Invoke("ResetDamageCooldown", damageCooldownTime); // Invoke the method to reset the damage cooldown
+                ApplyKnockbackIfHeavy(other);
+                ProcessAttackEnd();
+            }
+        }
+        else if (other.CompareTag("Player"))
+        {
+            // Logic for when hitting the player
+            Health playerHealth = other.GetComponentInParent<Health>();
+            if (playerHealth != null && canDealDamage)
+            {
+                playerHealth.TakeDamage(damage);
+                // Apply any player-specific effects here
+                ProcessAttackEnd();
             }
         }
     }
 
-    // Method to reset the damage cooldown
+    private void ApplyKnockbackIfHeavy(Collider other)
+    {
+        if (!IsHeavy) return;
+
+        // Knockback logic remains the same
+        EnemyAiTutorial enemyAi = other.GetComponentInParent<EnemyAiTutorial>();
+        if (enemyAi != null)
+        {
+            Vector3 knockbackDirection = (other.transform.position - transform.position).normalized;
+            Rigidbody enemyRigidbody = other.GetComponentInParent<Rigidbody>();
+            if (enemyRigidbody != null)
+            {
+                enemyRigidbody.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
+                enemyAi.KnockBack();
+            }
+        }
+    }
+
+    private void ProcessAttackEnd()
+    {
+        canDealDamage = false;
+        weaponCollider.enabled = false;
+        Invoke("ResetDamageCooldown", damageCooldownTime);
+    }
+
     private void ResetDamageCooldown()
     {
-        canDealDamage = true; // Enable dealing damage
-        weaponCollider.enabled = true; // Reactivate the collider
+        canDealDamage = true;
+        weaponCollider.enabled = true;
     }
 }

@@ -3,8 +3,6 @@ using UnityEngine;
 public class EnemyAnimationChanger : MonoBehaviour
 {
     private EnemyAiTutorial enemyAi; // Reference to the EnemyAiTutorial script
-    [SerializeField] private Animator animator;
-
     private EnemyState currentAnimationState;
     private EnemyState previousAnimationState;
     private float blendTimer = 0.25f;
@@ -17,7 +15,7 @@ public class EnemyAnimationChanger : MonoBehaviour
         // Ensure all components are assigned properly
         if (enemyAi == null)
             Debug.LogError("EnemyAiTutorial component not found!");
-        if (animator == null)
+        if (enemyAi.animator == null)
             Debug.LogError("Animator component not found!");
     }
 
@@ -75,7 +73,7 @@ public class EnemyAnimationChanger : MonoBehaviour
     {
         if (currentAnimationState != previousAnimationState)
         {
-            animator.CrossFadeInFixedTime(animationName, blendTimer);
+            enemyAi.animator.CrossFadeInFixedTime(animationName, blendTimer);
         }
        
     }

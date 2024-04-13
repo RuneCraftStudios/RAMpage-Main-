@@ -5,6 +5,9 @@ using UnityEngine.AI;
 
 public class RangedEnemy : EnemyAiTutorial
 {
+    [Header("Projectile Parameters")]
+    public GameObject Projectile;
+    public Transform[] muzzleTransforms; // Array of muzzle transforms for projectile spawn positions
     public float timeBetweenAttacks;
     public float raycastCooldownDuration;
     private float lastRaycastTime;

@@ -65,10 +65,6 @@ public class EnemyAiTutorial : MonoBehaviour
     public float awarenessRadius = 3f;
     public bool playerInSightRange = false;
     public bool playerInAttackRange = false;
-
-    [Header("Projectile Parameters")]
-    public GameObject Projectile;
-    public Transform[] muzzleTransforms; // Array of muzzle transforms for projectile spawn positions
     
     [Header("Stun Parameters")]
     private float StunDuration = 3.0f;
@@ -82,6 +78,7 @@ public class EnemyAiTutorial : MonoBehaviour
     private RangedEnemy rangedEnemy;
     public GameObject gazeObject;
     public float rotationSpeed;
+    [SerializeField] public Animator animator;
     public EnemyState CurrentState
     {
         get { return currentState; }
@@ -204,7 +201,7 @@ public class EnemyAiTutorial : MonoBehaviour
         if (currentState == EnemyState.Attack)
         {
             Debug.Log("EnteredAttackState");
-            agent.speed = 0.1f;
+            agent.speed = 0f;
         }
         if (currentState == EnemyState.Decision)
         {
@@ -301,19 +298,34 @@ public class EnemyAiTutorial : MonoBehaviour
 
     public void SelectAttackMethod()
     {
-        if (playerInAttackRange)
+        if (!playerInAttackRange)
         {
-            RangedEnemy rangedEnemy = GetComponent<RangedEnemy>(); // Assuming RangedEnemy is a component on the same GameObject
-            if (rangedEnemy != null)
-            {
-                rangedEnemy.AttackPlayer(); // Call the AttackPlayer() method on the instance of RangedEnemy
-            }
-            else
-            {
-                Debug.LogError("RangedEnemy component not found!");
-            }
+            // If the player isn't in attack range, perhaps no action is taken, or you could handle other behaviors here.
+            return;
         }
+
+        // Try to get the RangedEnemy component
+        RangedEnemy rangedEnemy = GetComponent<RangedEnemy>();
+        if (rangedEnemy != null)
+        {
+            // If the component exists, use the ranged attack
+            rangedEnemy.AttackPlayer();
+            return; // Ensure no further checks are made once the appropriate action is taken
+        }
+
+        // Try to get the MeleeEnemy component
+        MeleeEnemy meleeEnemy = GetComponent<MeleeEnemy>();
+        if (meleeEnemy != null)
+        {
+            // If the component exists, use the melee attack
+            meleeEnemy.AttackPlayer();
+            return; // Ensure no further checks are made once the appropriate action is taken
+        }
+
+        // If neither component is found, log an error.
+        Debug.LogError("No suitable enemy component found!");
     }
+
 
     public void Stun()
     {

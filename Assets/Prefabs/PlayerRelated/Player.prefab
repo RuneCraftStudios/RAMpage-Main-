@@ -2049,8 +2049,6 @@ MonoBehaviour:
   currentShield: 0
   currentEnergy: 0
   ConsumeEnergy: 0
-  isElectrified: 0
-  isIgnited: 0
 --- !u!114 &9157046701470640087
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -904,15 +904,16 @@ MonoBehaviour:
   awarenessRadius: 5
   playerInSightRange: 0
   playerInAttackRange: 0
+  isStunned: 0
+  checkInterval: 0.1
+  gazeObject: {fileID: 3159777089034663302}
+  rotationSpeed: 100
+  animator: {fileID: 8266792405712752487}
   Projectile: {fileID: 5769944953533130351, guid: 345cdff958e754d468c713876a236d76,
     type: 3}
   muzzleTransforms:
   - {fileID: 1439092767027093028}
   - {fileID: 7724487666462589872}
-  isStunned: 0
-  checkInterval: 0.1
-  gazeObject: {fileID: 3159777089034663302}
-  rotationSpeed: 100
   timeBetweenAttacks: 3
   raycastCooldownDuration: 2
   grenade: {fileID: 5769944953533130351, guid: 4919f8d22d53e694a8e86e029a95bd3b, type: 3}
@@ -968,7 +969,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ce0d2238c9cca14e81e5db28bb84a6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 8266792405712752487}
 --- !u!1 &6455576985515934727
 GameObject:
   m_ObjectHideFlags: 0

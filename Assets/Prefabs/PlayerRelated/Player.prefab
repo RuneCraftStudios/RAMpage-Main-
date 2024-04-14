@@ -372,12 +372,12 @@ GameObject:
   - component: {fileID: 5939458299994600613}
   - component: {fileID: 1254717492390112424}
   m_Layer: 9
-  m_Name: GameOverSFX
+  m_Name: AudioSource2D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5939458299994600613
 Transform:
   m_ObjectHideFlags: 0
@@ -404,7 +404,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -1848,7 +1848,6 @@ GameObject:
   - component: {fileID: 2930464928234276535}
   - component: {fileID: 6346575827952274395}
   - component: {fileID: 2017572395164281495}
-  - component: {fileID: 7755350860341188841}
   - component: {fileID: 5183883371004019928}
   - component: {fileID: 9157046701470640087}
   m_Layer: 9
@@ -2014,20 +2013,6 @@ CapsuleCollider:
   m_Height: 1.75
   m_Direction: 1
   m_Center: {x: 0, y: 0.7550553, z: 0}
---- !u!114 &7755350860341188841
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8160341290175571358}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb9ff45805fbe2f43a7a4181c0892fac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameOverUI: {fileID: 3083847194486986976}
-  gameOverSound: {fileID: 1994928921423084070}
 --- !u!114 &5183883371004019928
 MonoBehaviour:
   m_ObjectHideFlags: 0

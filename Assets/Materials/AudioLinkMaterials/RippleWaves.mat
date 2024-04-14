@@ -12,15 +12,17 @@ Material:
     type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _RECEIVE_SHADOWS_OFF
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 2000
   stringTagMap:
     RenderType: Opaque
-  disabledShaderPasses: []
+  disabledShaderPasses:
+  - SHADOWCASTER
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -58,7 +60,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Main_Texture:
-        m_Texture: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
+        m_Texture: {fileID: 2800000, guid: 672c3ed758b9f3d43b6f6a4308f73cda, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -98,7 +100,7 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
-    - _CastShadows: 1
+    - _CastShadows: 0
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -121,9 +123,9 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _RMS: 0
-    - _ReceiveShadows: 1
-    - _RippleCount: 2
-    - _RippleSpeed: 0.75
+    - _ReceiveShadows: 0
+    - _RippleCount: 1
+    - _RippleSpeed: 0.1
     - _RippleStrength: 0.75
     - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
@@ -145,7 +147,7 @@ Material:
     - _RippleCenter: {r: 0, g: 0, b: 0, a: 0}
     - _RippleCenter2D: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _Tiling: {r: 1, g: 1, b: 0, a: 0}
+    - _Tiling: {r: 15, g: 8, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &1059071712604358558
 MonoBehaviour:

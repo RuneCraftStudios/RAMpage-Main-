@@ -2,37 +2,62 @@ using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
-    public EnemyAiTutorial[] groundEnemies; // Array to store references to all ground enemy AI scripts
-    public float groundEnemySpawnInterval = 3f; // Time interval between activating each ground enemy
+    public EnemyWave[] waves; // Array of waves
 
-    private int groundEnemiesActivated = 0; // Counter to keep track of activated ground enemies
-    private float groundEnemyTimer = 0f;
+    private int currentWaveIndex = 0;
+    private float cooldownTimer = 0f;
+    private bool isCooldown = false;
+
+    private void Start()
+    {
+        StartWave(currentWaveIndex);
+    }
 
     private void Update()
     {
-        // Increment the timer
-        groundEnemyTimer += Time.deltaTime;
-
-        // Check if it's time to activate the next ground enemy
-        if (groundEnemyTimer >= groundEnemySpawnInterval)
+        if (isCooldown)
         {
-            groundEnemyTimer = 0f;
-
-            if (groundEnemiesActivated < groundEnemies.Length)
+            cooldownTimer += Time.deltaTime;
+            if (cooldownTimer >= waves[currentWaveIndex].nextWaveCooldown)
             {
-                ActivateNextGroundEnemy();
+                cooldownTimer = 0f;
+                isCooldown = false;
+                currentWaveIndex++;
+                if (currentWaveIndex < waves.Length)
+                {
+                    StartWave(currentWaveIndex);
+                }
             }
-            else
-            {
-                // All ground enemies have been activated, stop the manager
-                enabled = false;
-            }
+        }
+        else
+        {
+            CheckWaveCompletion();
         }
     }
 
-    private void ActivateNextGroundEnemy()
+    private void StartWave(int index)
     {
-        groundEnemies[groundEnemiesActivated].ChangeState(EnemyState.Patrol);
-        groundEnemiesActivated++;
+        foreach (var enemy in waves[index].enemies)
+        {
+            enemy.ChangeState(EnemyState.Patrol); // Assumes this will enable the necessary components
+        }
+    }
+
+    private void CheckWaveCompletion()
+    {
+        bool allDeactivated = true;
+        foreach (var enemy in waves[currentWaveIndex].enemies)
+        {
+            if (enemy.gameObject.activeSelf) // Check if the GameObject is active in the hierarchy
+            {
+                allDeactivated = false;
+                break;
+            }
+        }
+
+        if (allDeactivated)
+        {
+            isCooldown = true;
+        }
     }
 }

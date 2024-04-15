@@ -7,10 +7,14 @@ public class EnemyManager : MonoBehaviour
     private int currentWaveIndex = 0;
     private float cooldownTimer = 0f;
     private bool isCooldown = false;
+    private GameManager gameManager;
 
     private void Start()
     {
-        StartWave(currentWaveIndex);
+        if (waves.Length > 0)
+        {
+            StartWave(currentWaveIndex);  // Start the first wave only if there are any waves
+        }
     }
 
     private void Update()
@@ -23,9 +27,13 @@ public class EnemyManager : MonoBehaviour
                 cooldownTimer = 0f;
                 isCooldown = false;
                 currentWaveIndex++;
-                if (currentWaveIndex < waves.Length)
+                if (currentWaveIndex < waves.Length) // Check if the new index is within bounds
                 {
                     StartWave(currentWaveIndex);
+                }
+                else
+                {
+                    Debug.Log("All waves completed!");
                 }
             }
         }
@@ -39,23 +47,27 @@ public class EnemyManager : MonoBehaviour
     {
         foreach (var enemy in waves[index].enemies)
         {
-            enemy.ChangeState(EnemyState.Patrol); // Assumes this will enable the necessary components
+            enemy.ChangeState(EnemyState.Patrol); // Assume this enables necessary components
         }
     }
 
     private void CheckWaveCompletion()
     {
-        bool allDeactivated = true;
+        bool allDead = true;
         foreach (var enemy in waves[currentWaveIndex].enemies)
         {
-            if (enemy.gameObject.activeSelf) // Check if the GameObject is active in the hierarchy
+            if (enemy != null && enemy.gameObject != null)
             {
-                allDeactivated = false;
-                break;
+                EnemyHealth health = enemy.GetComponent<EnemyHealth>();
+                if (health != null && health.CurrentHealth > 0)
+                {
+                    allDead = false;
+                    break;
+                }
             }
         }
 
-        if (allDeactivated)
+        if (allDead)
         {
             isCooldown = true;
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class ImmersiveWeapon : MonoBehaviour
 {
@@ -17,21 +18,38 @@ public class ImmersiveWeapon : MonoBehaviour
     public AudioClip ChargingUpClip;
     public AudioClip ShootClip;
     public AudioClip DisengageClip;
+    public AudioClip NoEnergyClip;
 
     [Header("Weapon Animator")]
     public Animator Animator;
 
     [Header("Weapon Attributes")]
-    public float WeaponChargeDelay;
     public int EnergyCost;
 
     public Health Health;
 
-    public void Fire()
+    void Start()
     {
-        Animator.SetBool("ChargingUp", true);
-        AudioSource.PlayOneShot(ChargingUpClip);
-        StartCoroutine(Firing());
+        XRGrabInteractable grabbable = GetComponent<XRGrabInteractable>();
+        grabbable.activated.AddListener(FireBullet);
+        int energy = Health.CurrentEnergy;
+    }
+    public void FireBullet(ActivateEventArgs Arg)
+    {
+        
+        if (ChargingUpClip != null)
+        {
+            AudioSource.PlayOneShot(ChargingUpClip);
+            Animator.Play("ChargingUp");
+        }
+        int energy = Health.CurrentEnergy;
+
+        Animator.Play("Shoot");
+        // Instantiate the bullet, play audio, and trigger animation as before...
+        GameObject spawnedBullet = Instantiate(Bullet, MuzzleTransform.position, MuzzleTransform.rotation);
+        spawnedBullet.transform.Rotate(Vector3.up, 0f);
+        AudioSource.PlayOneShot(ShootClip);
+        ConsumeEnergy();
     }
 
     public void ConsumeEnergy()
@@ -41,17 +59,12 @@ public class ImmersiveWeapon : MonoBehaviour
 
     public void Disengage()
     {
-        AudioSource.PlayOneShot(DisengageClip);
+        if (!DisengageClip)
+        {
+            AudioSource.PlayOneShot(DisengageClip);
+        }
+        
     }
 
-    private IEnumerator Firing()
-    {
-        yield return new WaitForSeconds(WeaponChargeDelay);
-
-        // Instantiate the bullet, play audio, and trigger animation as before...
-        GameObject spawnedBullet = Instantiate(Bullet, MuzzleTransform.position, MuzzleTransform.rotation);
-        spawnedBullet.transform.Rotate(Vector3.up, 180f);
-        AudioSource.PlayOneShot(ShootClip);
-        ConsumeEnergy();
-    }
+    
 }

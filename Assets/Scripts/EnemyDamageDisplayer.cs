@@ -33,7 +33,6 @@ public class DamageTextManager : MonoBehaviour
     public void DisplayDamage(int damage, string damageType)
     {
         TextMeshProUGUI selectedTextComponent = baseDamageText; // Default to base damage text
-
-        // The rest of your method remains unchanged...
+        
     }
 }

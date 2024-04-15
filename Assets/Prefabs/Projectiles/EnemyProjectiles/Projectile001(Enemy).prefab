@@ -29017,9 +29017,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2919225967121264302}
-  - component: {fileID: 2466930561331659632}
   - component: {fileID: 4642127679229304506}
   - component: {fileID: 4244277401017779936}
+  - component: {fileID: 2466930561331659632}
   - component: {fileID: 2158934495563918133}
   m_Layer: 12
   m_Name: Projectile001(Enemy)
@@ -29044,27 +29044,6 @@ Transform:
   - {fileID: 1107644384582956734}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &2466930561331659632
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5769944953533130351}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.045
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &4642127679229304506
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29077,10 +29056,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9de6486cd9552a4180751bb26e4d7a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 7.5
-  accuracy: 0
+  speed: 12.5
+  accuracy: 5
   maxDistance: 100
-  damage: 25
+  damage: 5
   explodeOnCollision: 0
   explosionRadius: 5
   explosionDamage: 20
@@ -29204,6 +29183,27 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!135 &2466930561331659632
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5769944953533130351}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.045
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &2158934495563918133
 Rigidbody:
   m_ObjectHideFlags: 0

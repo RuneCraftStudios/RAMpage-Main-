@@ -1671,7 +1671,7 @@ MonoBehaviour:
   m_EnableStrafe: 1
   m_EnableFly: 0
   m_UseGravity: 1
-  m_GravityApplicationMode: 0
+  m_GravityApplicationMode: 1
   m_ForwardSource: {fileID: 7891474329718944570}
   m_LeftHandMoveAction:
     m_UseReference: 1
@@ -1729,7 +1729,7 @@ MonoBehaviour:
       m_Flags: 0
     m_Reference: {fileID: 5435599910023553544, guid: c348712bda248c246b8c49b3db54643f,
       type: 3}
-  JumpHeight: 3
+  JumpHeight: 5
   cc: {fileID: 6229161410807278908}
   groundLayers:
     serializedVersion: 2
@@ -2025,9 +2025,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13697f1b0e21b2e458223020fe8f6f7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  maxShield: 100
-  maxEnergy: 100
+  maxHealth: 50
+  maxShield: 50
+  maxEnergy: 50
   rechargeDelay: 2
   shieldRechargeRate: 5
   currentHealth: 0
@@ -2940,6 +2940,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5655907830101604067}
     m_Modifications:
+    - target: {fileID: 664489801923019586, guid: 2fd3e07afe5b461490fb8e314976b1b0,
+        type: 3}
+      propertyPath: m_InteractionLayers.m_Bits
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6189354538098044173, guid: 2fd3e07afe5b461490fb8e314976b1b0,
         type: 3}
       propertyPath: m_RootOrder
@@ -3759,6 +3764,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6295109348569573081}
     m_Modifications:
+    - target: {fileID: 664489801923019586, guid: 2fd3e07afe5b461490fb8e314976b1b0,
+        type: 3}
+      propertyPath: m_InteractionLayers.m_Bits
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6189354538098044173, guid: 2fd3e07afe5b461490fb8e314976b1b0,
         type: 3}
       propertyPath: m_RootOrder

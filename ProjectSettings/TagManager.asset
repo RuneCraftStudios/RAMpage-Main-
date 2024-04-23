@@ -8,6 +8,7 @@ TagManager:
   - ChargingStation
   - Item
   - Explosion
+  - Obstacle
   layers:
   - Default
   - TransparentFX

@@ -1,75 +1,83 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public class EnemyManager : MonoBehaviour
 {
-    public EnemyWave[] waves; // Array of waves
+    public List<Wave> waves;
+    public float timeBetweenWaves = 5.0f; // Time between waves
+    [SerializeField] private GameManager gameManager;
 
     private int currentWaveIndex = 0;
-    private float cooldownTimer = 0f;
-    private bool isCooldown = false;
-    private GameManager gameManager;
+    private GameObject[] currentWave;
+    private bool spawningWave = false;
 
-    private void Start()
+    private void Awake()
     {
-        if (waves.Length > 0)
+        StartWave();
+    }
+
+    private void StartWave()
+    {
+        if (currentWaveIndex < waves.Count)
         {
-            StartWave(currentWaveIndex);  // Start the first wave only if there are any waves
+            currentWave = waves[currentWaveIndex].enemies;
+            StartCoroutine(SpawnWave());
         }
+        else
+        {
+            gameManager.LevelCleared();
+        }
+    }
+
+    private IEnumerator SpawnWave()
+    {
+        spawningWave = true;
+
+        foreach (var enemy in currentWave)
+        {
+            if (enemy != null)
+            {
+                enemy.SetActive(true);
+                EnemyAiTutorial ai = enemy.GetComponent<EnemyAiTutorial>();
+                if (ai != null)
+                {
+                    ai.ChangeState(EnemyState.WaitingToBeSpawned);
+                }
+            }
+        }
+
+        yield return new WaitUntil(() => AllEnemiesDeactivated());
+
+        // Delay before starting the next wave (you can add animation and music here)
+        yield return new WaitForSeconds(timeBetweenWaves);
+
+        currentWaveIndex++;
+        StartWave();
+
+        spawningWave = false;
+    }
+
+    private bool AllEnemiesDeactivated()
+    {
+        foreach (var enemy in currentWave)
+        {
+            if (enemy != null && enemy.activeSelf)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void Update()
     {
-        if (isCooldown)
+        // Check if all enemies of the current wave are deactivated
+        if (!spawningWave && AllEnemiesDeactivated())
         {
-            cooldownTimer += Time.deltaTime;
-            if (cooldownTimer >= waves[currentWaveIndex].nextWaveCooldown)
-            {
-                cooldownTimer = 0f;
-                isCooldown = false;
-                currentWaveIndex++;
-                if (currentWaveIndex < waves.Length) // Check if the new index is within bounds
-                {
-                    StartWave(currentWaveIndex);
-                }
-                else
-                {
-                    Debug.Log("All waves completed!");
-                }
-            }
-        }
-        else
-        {
-            CheckWaveCompletion();
-        }
-    }
-
-    private void StartWave(int index)
-    {
-        foreach (var enemy in waves[index].enemies)
-        {
-            enemy.ChangeState(EnemyState.Patrol); // Assume this enables necessary components
-        }
-    }
-
-    private void CheckWaveCompletion()
-    {
-        bool allDead = true;
-        foreach (var enemy in waves[currentWaveIndex].enemies)
-        {
-            if (enemy != null && enemy.gameObject != null)
-            {
-                EnemyHealth health = enemy.GetComponent<EnemyHealth>();
-                if (health != null && health.CurrentHealth > 0)
-                {
-                    allDead = false;
-                    break;
-                }
-            }
-        }
-
-        if (allDead)
-        {
-            isCooldown = true;
+            gameManager.ManagerAudioSource.PlayOneShot(gameManager.WaveClear);
+            // You can add any post-wave logic here
+            Debug.Log("Wave " + (currentWaveIndex + 1) + " cleared!");
         }
     }
 }

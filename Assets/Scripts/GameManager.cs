@@ -6,13 +6,17 @@ public class GameManager : MonoBehaviour
     public static GameManager instance; // Singleton instance
 
     [Header("ClearLevelSettings")]
-    public AudioSource AudioSource;
+    public AudioSource ManagerAudioSource;
+    public AudioSource SoundtrackAudioSource;
     public AudioClip levelclearClip;
     public List<GameObject> LevelDoors; // Changed to a list of GameObjects
 
     [Header("GameOverSettings")]
     public GameObject gameOverUI; // UI element displayed when the player dies
     public AudioClip gameoverClip; // Sound clip played when the game is over
+
+    [Header("WaveClearSettings")]
+    public AudioClip WaveClear;
 
     private bool GameOver = false;
     private bool isLevelClear = false;
@@ -61,7 +65,7 @@ public class GameManager : MonoBehaviour
         // Play game over sound
         if (gameoverClip != null)
         {
-            AudioSource.PlayOneShot(gameoverClip);
+            ManagerAudioSource.PlayOneShot(gameoverClip);
         }
 
         // Show game over UI
@@ -85,6 +89,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        AudioSource.PlayOneShot(levelclearClip);
+        ManagerAudioSource.PlayOneShot(levelclearClip);
+        SoundtrackAudioSource.Stop();
     }
 }

@@ -24,61 +24,71 @@ public class EnemyAiTutorial : MonoBehaviour
     [Header("Set Layers")]
     public LayerMask GroundLayer;
     public LayerMask PlayerLayer;
-    public LayerMask ignoreRaycastLayer;
     public LayerMask ObstacleLayers;
+    public LayerMask ignoreRaycastLayer;
 
-    [Header("NavMesh Settings")]
+    [Header("Required Components")]
     public NavMeshAgent agent;
+    public GameObject gazeObject;
+    private bool ComponentsActive = true;
+    public Animator animator;
 
     [Header("Set Target")]
     public Transform player;
-    public Collider playerCollider; // Collider component of the player
+    public Collider playerCollider;
 
     [Header("Determine Renderers")]
-    public MeshRenderer[] meshRenderers; // Array of mesh renderers for the enemy
-    public SkinnedMeshRenderer[] skinnedMeshRenderers; // Array of skinned mesh renderers for the enemy
+    public  MeshRenderer[] meshRenderers;
+    public  SkinnedMeshRenderer[] skinnedMeshRenderers;
 
     [Header("Enemy Hitbox")]
-    public Rigidbody enemyRigidbody; // Rigidbody component for physics simulation
-    public Collider[] enemyColliders; // Array of collider components for collision detection
- 
+    public  Rigidbody enemyRigidbody;
+    public Collider[] enemyColliders;
     public AnimationClip DieAnimationClip;
 
     [Header("Base Parameters")]
-    private EnemyHealth health; // Reference to the Health component
-    private int maxHealth; // Maximum health of the enemy
-    public LootSystem lootSystem; // Reference to the LootSystem script
+    private EnemyHealth health;
+    private int maxHealth;
+    private LootSystem lootSystem;
 
     [Header("Patrol Parameters")]
-    public float patrolSpeed = 2f; // Speed of the enemy while patrolling
+    public float patrolSpeed = 2f;
     public Vector3 walkpoint;
     public bool walkpointSet;
     public float walkpointRange;
     public float CheckPointFrequency;
 
     [Header("Chase Parameters")]
-    public float chaseSpeed = 4f; // Speed of the enemy while chasing
+    public float chaseSpeed = 4f;
 
     [Header("Attack Parameters")]
     public float sightRange, attackRange;
+    public float timeBetweenAttacks;
     public float fieldOfViewAngle = 90f;
-    public float awarenessRadius = 3f;
     public bool playerInSightRange = false;
     public bool playerInAttackRange = false;
     
     [Header("Stun Parameters")]
-    private float StunDuration = 3.0f;
+    public float StunDuration = 3.0f;
     public bool isStunned = false;
 
-    //States
-    protected EnemyState currentState;
-    private Coroutine checkPlayerCoroutine;
-    private IEnumerator searchWalkPointCoroutine;
-    public float checkInterval = 0.1f;
+    [Header("Projectile Parameters")]
+    public GameObject Projectile;
+    public Transform[] muzzleTransforms;
+
+    //Numerator&CourotineReferences
+    public Coroutine checkPlayerCoroutine;
+    public IEnumerator searchWalkPointCoroutine;
+    //EnemyReferences
     private RangedEnemy rangedEnemy;
-    public GameObject gazeObject;
-    public float rotationSpeed;
-    [SerializeField] public Animator animator;
+    private ExplodingEnemy explodingEnemy;
+    private MeleeEnemy meleeEnemy;
+    private EvasiveEnemy evasiveEnemy;
+    //StateReferences
+    protected EnemyState currentState;
+    //Constants
+    private float checkInterval = 0.1f;
+    private float rotationSpeed = 360;
     public EnemyState CurrentState
     {
         get { return currentState; }
@@ -86,154 +96,162 @@ public class EnemyAiTutorial : MonoBehaviour
     }
     private void Awake()
     {
-        player = GameObject.Find("Player").transform;
+        checkPlayerCoroutine = StartCoroutine(CheckPlayerPresence());
+        GameObject playerGameObject = GameObject.Find("Player");
         agent = GetComponent<NavMeshAgent>();
         health = GetComponent<EnemyHealth>();
-        maxHealth = health.maxHealth;
-        rangedEnemy = GetComponent<RangedEnemy>();
-        // Start the coroutine to periodically check player presence
-        checkPlayerCoroutine = StartCoroutine(CheckPlayerPresence());
-        // Ensure Rigidbody component is assigned
+
+        if (playerGameObject != null)
+        {
+            player = playerGameObject.transform;
+            playerCollider = playerGameObject.GetComponent<CapsuleCollider>();
+            if (playerCollider == null) // Check if the CapsuleCollider component is present on the Player
+            {
+                Debug.LogError("CapsuleCollider not found on the Player GameObject!");
+            }
+        }
+        else
+        {
+            Debug.LogError("Player GameObject not found!");
+        }
+        if (health != null)
+        {
+            maxHealth = health.maxHealth;
+        }
+        else
+        {
+            Debug.LogError("EnemyHealth component not found!");
+        }
+
         if (enemyRigidbody == null)
         {
             enemyRigidbody = GetComponent<Rigidbody>();
+            if (enemyRigidbody == null)
+            {
+                Debug.LogError("Rigidbody component not found!");
+            }
         }
+
         // Ensure Collider components are assigned
+        enemyColliders = GetComponentsInChildren<Collider>();
         if (enemyColliders == null || enemyColliders.Length == 0)
         {
-            enemyColliders = GetComponentsInChildren<Collider>();
+            Debug.LogError("No Collider components found in children!");
         }
+
     }
+
     private void Update()
     {
         switch (currentState)
         {
             case EnemyState.WaitingToBeSpawned:
-                //Debug.Log("EnteredWaitingToBeSpawnedState");
-                // Disable all mesh renderers in WaitingToBeSpawned state
-                foreach (var renderer in meshRenderers)
-                {
-                    if (renderer != null)
-                    {
-                        renderer.enabled = false;
-                    }
-                }
-                foreach (var skinnedRenderer in skinnedMeshRenderers)
-                {
-                    if (skinnedRenderer != null)
-                    {
-                        skinnedRenderer.enabled = false;
-                    }
-                }
-
-                foreach (var collider in enemyColliders)
-                {
-                    if (collider != null)
-                    {
-                        collider.enabled = false;
-                    }
-                }
                 break;
-
             case EnemyState.Patrol:
-                Patroling();
                 break;
-
             case EnemyState.Chase:
-
-                ChasePlayer();
-
                 break;
             case EnemyState.Attack:
-                SelectAttackMethod();
                 break;
             case EnemyState.Stun:
                 break;
             case EnemyState.KnockBack:
                 break;
             case EnemyState.Relocating:
+                
                 break;
             case EnemyState.ThrowingGrenade:
                 break;
             case EnemyState.Decision:
                 break;
-
+            
             case EnemyState.Die:
-                Debug.Log("EnteredDieState");
-                agent.isStopped = true;
-                sightRange = 0;
-                attackRange = 0;    
-                StartCoroutine(DieAfterBufferTime());
                 break;
         }
+        
     }
     public void ChangeState(EnemyState newState)
     {
         currentState = newState;
-
-        if (gameObject.activeInHierarchy) // Check if the enemy is still active
+        if (currentState == EnemyState.WaitingToBeSpawned)
         {
-            StartCoroutine(EnableMeshRenderersAfterDelay(1.0f)); // Adjust the delay as needed
+            StartCoroutine(EnableMeshRenderersAfterDelay(1f));
         }
+
         if (currentState == EnemyState.Relocating)
         {
-            agent.speed = patrolSpeed;
-            StartCoroutine(rangedEnemy.Relocate());
-            Debug.Log("EnteredRelocateState");
+            EvasiveEnemy evasiveEnemy = GetComponent<EvasiveEnemy>();
+            RangedEnemy rangedEnemy = GetComponent<RangedEnemy>();
+            if (rangedEnemy != null)
+            {
+                agent.isStopped = false;
+                agent.speed = 2f;
+                rangedEnemy.Relocate();
+            }
+            if (evasiveEnemy != null)
+            {
+                agent.isStopped = false;
+                agent.speed = 20f;
+                StartCoroutine(evasiveEnemy.Relocate());
+            }
+            
         }
+
         if (currentState == EnemyState.ThrowingGrenade)
         {
-            RotateTowardsPlayer();
-            StartCoroutine(rangedEnemy.ThrowGrenade());
-            Debug.Log("EnteredThrowingGrenadeState");
+            RangedEnemy rangedEnemy = GetComponent<RangedEnemy>();
+            if (rangedEnemy != null)
+            {
+                rangedEnemy.ThrowGrenade();
+            }
         }
         if (currentState == EnemyState.Patrol)
         {
+            agent.isStopped = false;
             agent.speed = patrolSpeed;
-            Debug.Log("EnteredPatrolState");
+            Patroling();
         }
         if (currentState == EnemyState.Chase)
         {
-            RotateTowardsPlayer();
+            agent.isStopped = false;
             agent.speed = chaseSpeed;
-            Debug.Log("EnteredChaseState");
+            ChasePlayer();
         }
         if (currentState == EnemyState.Attack)
         {
-            Debug.Log("EnteredAttackState");
-            agent.speed = 0f;
+            SelectAttackMethod();
+            //Debug.Log("AttackStateCalled");
         }
         if (currentState == EnemyState.Decision)
         {
-            Debug.Log("EnteredDecisionState");
+            agent.isStopped = true;
             MakeDecision();
         }
         if (currentState == EnemyState.Stun)
         {
-            Debug.Log("EnteredStunState");
             isStunned = true;
             agent.isStopped = true;
             StartCoroutine(RecoverFromStun(StunDuration));
         }
         if (currentState == EnemyState.KnockBack)
         {
-            RotateTowardsPlayer();
-            Debug.Log("EnteredKnockBackState");
             agent.isStopped = true;
+            RotateTowardsPlayer();
             StartCoroutine(RecoverFromKnockBack());
         }
 
-    }
+        if (currentState == EnemyState.Die)
+        {
+            agent.isStopped = true;
+            sightRange = 0;
+            attackRange = 0;
+            StartCoroutine(DieAfterBufferTime());
+        }
 
-    private IEnumerator PrepareAttack()
-    {
-        yield return new WaitForSeconds(1.0f);
-        SelectAttackMethod();
     }
-
     private void Patroling()
     {
-        if (playerInSightRange == false)
+        if (!playerInSightRange)
         {
             if (!walkpointSet)
                 SearchWalkPoint();
@@ -243,90 +261,103 @@ public class EnemyAiTutorial : MonoBehaviour
 
             Vector3 distanceToWalkPoint = transform.position - walkpoint;
 
-            //Walkpoint reached
             if (distanceToWalkPoint.magnitude < 1f)
                 walkpointSet = false;
+            StartCoroutine(ReturnToDecisionSlow());
         }
-        if (playerInSightRange == true)
-        {
-            ChangeState(EnemyState.Decision);
-        }
+        
       
     }
-    private void SearchWalkPoint()
+    public void SearchWalkPoint()
     {
         if (searchWalkPointCoroutine == null)
         {
-            searchWalkPointCoroutine = SearchWalkPointCoroutine(); // Call the coroutine directly
-            StartCoroutine(searchWalkPointCoroutine); // Start the coroutine
-        }
-    }
-
-    private void ChasePlayer()
-    {
-        // If the player is within sight range but not within attack range, continue chasing
-        if (playerInSightRange && !playerInAttackRange)
-        {
-            agent.SetDestination(player.position);
-        }
-        // If the player is within attack range or the sight range is false, make a decision
-        else
-        {
-            ChangeState(EnemyState.Decision);
+            searchWalkPointCoroutine = SearchWalkPointCoroutine();
+            StartCoroutine(searchWalkPointCoroutine);
         }
     }
     public void MakeDecision()
     {
-        if (playerInAttackRange== true)
+        EvasiveEnemy evasiveEnemy = GetComponent<EvasiveEnemy>();
+
+        if (evasiveEnemy != null)
         {
-            ChangeState(EnemyState.Attack);
-            if (currentState == EnemyState.Attack)
+            if (playerInAttackRange && !evasiveEnemy.playerInEvasionRange)
             {
-                SelectAttackMethod();
+                //Debug.Log("Transition to Attack State");
+                ChangeState(EnemyState.Attack);
+            }
+            else if (playerInSightRange && !playerInAttackRange)
+            {
+                //Debug.Log("Transition to Chase State");
+                ChangeState(EnemyState.Chase);
+            }
+            else if (!playerInSightRange)
+            {
+                //Debug.Log("Transition to Patrol State");
+                ChangeState(EnemyState.Patrol);
             }
         }
-        if (playerInSightRange == true && playerInAttackRange == false)
-        {
-            ChangeState(EnemyState.Chase);
-        }
-        if (playerInSightRange == false)
-        {
-            ChangeState(EnemyState.Patrol);
-        }
 
+        else if (evasiveEnemy == null)
+        {
+            if (playerInAttackRange)
+            {
+                //Debug.Log("Transition to Attack State");
+                ChangeState(EnemyState.Attack);
+            }
+            else if (playerInSightRange && !playerInAttackRange)
+            {
+                //Debug.Log("Transition to Chase State");
+                ChangeState(EnemyState.Chase);
+            }
+            else if (!playerInSightRange)
+            {
+                //Debug.Log("Transition to Patrol State");
+                ChangeState(EnemyState.Patrol);
+            }
+        }
+      
     }
 
     public void SelectAttackMethod()
     {
+        RangedEnemy rangedEnemy = GetComponent<RangedEnemy>();
+        MeleeEnemy meleeEnemy = GetComponent<MeleeEnemy>();
+        ExplodingEnemy explodingEnemy = GetComponent<ExplodingEnemy>();
+        EvasiveEnemy evasiveEnemy = GetComponent<EvasiveEnemy>();
+
         if (!playerInAttackRange)
         {
-            // If the player isn't in attack range, perhaps no action is taken, or you could handle other behaviors here.
+            MakeDecision();
             return;
         }
 
-        // Try to get the RangedEnemy component
-        RangedEnemy rangedEnemy = GetComponent<RangedEnemy>();
         if (rangedEnemy != null)
         {
-            // If the component exists, use the ranged attack
+            //Debug.Log("RangedEnemyAttackCalled");
             rangedEnemy.AttackPlayer();
-            return; // Ensure no further checks are made once the appropriate action is taken
+            return;
         }
 
-        // Try to get the MeleeEnemy component
-        MeleeEnemy meleeEnemy = GetComponent<MeleeEnemy>();
         if (meleeEnemy != null)
         {
-            // If the component exists, use the melee attack
+            //Debug.Log("MeleeEnemyAttackCalled");
             meleeEnemy.AttackPlayer();
-            return; // Ensure no further checks are made once the appropriate action is taken
+            return;
         }
 
-        // If neither component is found, log an error.
-        Debug.LogError("No suitable enemy component found!");
+        if (explodingEnemy != null)
+        {
+            explodingEnemy.AttackPlayer();
+            return;
+        }
+
+        if (evasiveEnemy != null)
+        {
+            evasiveEnemy.AttackPlayer();
+        }
     }
-
-
     public void Stun()
     {
         ChangeState(EnemyState.Stun);
@@ -345,61 +376,89 @@ public class EnemyAiTutorial : MonoBehaviour
     private void Die()
     {
         DropLoot();
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 
+    public void ChasePlayer()
+    {
+        if (playerInSightRange && !playerInAttackRange)
+        {
+            agent.SetDestination(player.position);
+            StartCoroutine(ReturnToDecision());
+        }
+    }
     IEnumerator DieAfterBufferTime()
     {
-        yield return new WaitForSeconds(DieAnimationClip.length); // Wait for the buffer time
-        Die(); // Call your die logic after the buffer time
+        ExplodingEnemy explodingEnemy = GetComponent<ExplodingEnemy>();
+        if (explodingEnemy != null)
+        {
+            Die();
+        }
+        else
+        {
+            yield return new WaitForSeconds(DieAnimationClip.length);
+            Die();
+        }
     }
-
     void DropLoot()
     {
-        // Call the DropItems method from the LootSystem script if the GameObject is an enemy
         if (lootSystem != null)
         {
-            // Define the desired offset
-            Vector3 offset = new Vector3(0f, 1f, 0f); // Example offset (replace with your desired values)
-
-            // Call the DropItems method with the enemy GameObject and the offset
+            Vector3 offset = new Vector3(0f, 1f, 0f);
             lootSystem.DropItems(gameObject, offset);
         }
     }
 
-    private void DropItems()
+    protected void RotateTowardsPlayer()
     {
-        // Call the DropItems method from the LootSystem script
-        if (lootSystem != null)
-        {
-            // Define the desired location as a GameObject
-            GameObject desiredLocation = new GameObject("DesiredLocation");
-            desiredLocation.transform.position = new Vector3(10f, 0f, 5f); // Example coordinates (replace with your desired values)
-
-            // Call the DropItems method with the desired location as the reference object and zero offset
-            lootSystem.DropItems(desiredLocation, Vector3.zero);
-
-            // Destroy the GameObject used as the desired location after dropping items
-            Destroy(desiredLocation);
-        }
+        agent.isStopped = false;
+        agent.speed = chaseSpeed;
+        agent.SetDestination(player.position);
     }
 
+    public IEnumerator ReturnToDecision()
+    {
+        yield return new WaitForSeconds(0.2f);
+        ChangeState(EnemyState.Decision);
+    }
 
+    public IEnumerator ReturnToDecisionSlow()
+    {
+        yield return new WaitForSeconds(2f);
+        ChangeState(EnemyState.Decision);
+    }
+    private bool PlayerInSightRange()
+    {
+        bool playerSeen = false;
+        LayerMask combinedLayerMask = PlayerLayer | ~ignoreRaycastLayer;
+        Collider[] targetsInViewRadius = Physics.OverlapSphere(gazeObject.transform.position, sightRange, combinedLayerMask);
 
+        foreach (Collider targetCollider in targetsInViewRadius)
+        {
+
+            if (targetCollider.CompareTag("Player"))
+            {
+                playerSeen = true;
+                continue;
+            }
+
+            Vector3 directionToTarget = (targetCollider.transform.position - gazeObject.transform.position).normalized;
+
+            if (Vector3.Angle(gazeObject.transform.forward, directionToTarget) < fieldOfViewAngle / 2)
+            {
+
+                if (!Physics.Raycast(gazeObject.transform.position, directionToTarget, out RaycastHit hit, sightRange, ObstacleLayers))
+                {
+                    playerSeen = true;
+                    break;
+                }
+            }
+        }
+
+        return playerSeen;
+    }
     private void OnDrawGizmosSelected()
     {
-        // Draw FOV
-        float halfFOV = fieldOfViewAngle / 2f;
-        float viewDistance = sightRange;
-        Vector3 fovLine1 = Quaternion.AngleAxis(halfFOV, transform.up) * transform.forward * viewDistance;
-        Vector3 fovLine2 = Quaternion.AngleAxis(-halfFOV, transform.up) * transform.forward * viewDistance;
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(transform.position, fovLine1);
-        Gizmos.DrawRay(transform.position, fovLine2);
-        Gizmos.DrawLine(transform.position, transform.position + fovLine1);
-        Gizmos.DrawLine(transform.position, transform.position + fovLine2);
-
         // Draw sight range sphere
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, sightRange);
@@ -408,11 +467,15 @@ public class EnemyAiTutorial : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
 
-        // Draw awareness radius sphere
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, awarenessRadius);
-    }
+        // Draw Evade Range
+        EvasiveEnemy evasiveEnemy = GetComponent<EvasiveEnemy>();
+        if (evasiveEnemy != null)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position, evasiveEnemy.EvasionRange);
+        }
 
+    }
     private IEnumerator EnableMeshRenderersAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -439,6 +502,8 @@ public class EnemyAiTutorial : MonoBehaviour
                 collider.enabled = true;
             }
         }
+
+        ChangeState(EnemyState.Decision);
     }
 
     private IEnumerator RecoverFromStun(float StunDuration)
@@ -446,20 +511,16 @@ public class EnemyAiTutorial : MonoBehaviour
         yield return new WaitForSeconds(StunDuration);
         isStunned = false;
         agent.isStopped = false;
-        // Perform checks and transition to appropriate state after recovering from stun
-        // For example, you can check if the player is nearby and transition to Chase state
         if (health.CurrentHealth <= 0)
         {
             ChangeState(EnemyState.Die);
         }
         ChangeState(EnemyState.Decision);
     }
-
     private IEnumerator SearchWalkPointCoroutine()
     {
         while (true)
         {
-            // Calculate random point in range
             float randomZ = Random.Range(-walkpointRange, walkpointRange);
             float randomX = Random.Range(-walkpointRange, walkpointRange);
 
@@ -468,92 +529,34 @@ public class EnemyAiTutorial : MonoBehaviour
             NavMeshHit hit;
             if (NavMesh.SamplePosition(walkpoint, out hit, 2f, NavMesh.AllAreas))
             {
-                // Check if the sampled position is on the NavMesh
+                
                 walkpoint = hit.position;
                 walkpointSet = true;
 
-                yield return new WaitUntil(() => Vector3.Distance(transform.position, walkpoint) <= 0.5f); // Wait until the enemy reaches the walk point
+                yield return new WaitUntil(() => Vector3.Distance(transform.position, walkpoint) <= 0.5f);
 
-                walkpointSet = false; // Reset walkpointSet after reaching the walk point
+                walkpointSet = false; 
             }
 
-            yield return new WaitForSeconds(CheckPointFrequency); // Adjust this delay as needed
+            yield return new WaitForSeconds(CheckPointFrequency);
         }
     }
-
     private IEnumerator CheckPlayerPresence()
     {
-        Debug.Log("CheckPlayerPresence coroutine started.");
+        //Debug.Log("CheckPlayerPresence coroutine started.");
 
         while (true)
         {
-            // Check player presence within sight range
-            playerInSightRange = PlayerInSightRange();
-
-            // Check player presence within attack range
+            if (evasiveEnemy != null)
+            {
+                evasiveEnemy.playerInEvasionRange = Physics.CheckSphere(transform.position, evasiveEnemy.EvasionRange, PlayerLayer);
+            }
+            playerInSightRange = Physics.CheckSphere(transform.position, sightRange, PlayerLayer);
             playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, PlayerLayer);
-
             yield return new WaitForSeconds(checkInterval);
         }
     }
-
-    private bool PlayerInSightRange()
-    {
-        bool playerSeen = false; // Initialize playerSeen flag
-
-        // Combine the PlayerLayer and IgnoreRaycastLayer masks
-        LayerMask combinedLayerMask = PlayerLayer | ignoreRaycastLayer;
-
-        Collider[] targetsInViewRadius = Physics.OverlapSphere(gazeObject.transform.position, sightRange, combinedLayerMask);
-
-        for (int i = 0; i < targetsInViewRadius.Length; i++)
-        {
-            Transform target = targetsInViewRadius[i].transform;
-
-            // Check if the target is the player
-            if (targetsInViewRadius[i].CompareTag("Player"))
-            {
-                playerSeen = true; // Set playerSeen to true
-                continue; // Skip obstacle checks and continue to the next target
-            }
-
-            Vector3 directionToTarget = (target.position - gazeObject.transform.position).normalized;
-
-            // Check if the target is within the field of view angle
-            if (Vector3.Angle(gazeObject.transform.forward, directionToTarget) < fieldOfViewAngle / 2)
-            {
-                float distanceToTarget = Vector3.Distance(gazeObject.transform.position, target.position);
-
-                // Debug the raycast
-                Debug.DrawRay(gazeObject.transform.position, directionToTarget * distanceToTarget, Color.green);
-
-                // Perform the raycast
-                RaycastHit hit;
-                if (Physics.Raycast(gazeObject.transform.position, directionToTarget, out hit, distanceToTarget, ObstacleLayers))
-                {
-                    // If there's an obstacle, continue to the next target
-                    continue;
-                }
-                else
-                {
-                    playerSeen = true; // Set playerSeen to true
-                }
-            }
-        }
-
-        // Check if player is within awareness radius
-        Collider[] targetsInAwarenessRadius = Physics.OverlapSphere(gazeObject.transform.position, awarenessRadius, PlayerLayer);
-        if (targetsInAwarenessRadius.Length > 0)
-        {
-            playerSeen = true; // Set playerSeen to true
-        }
-
-        return playerSeen; // Return the playerSeen flag
-    }
-    protected void RotateTowardsPlayer()
-    {
-        agent.SetDestination(player.position);
-    }
+    
     private IEnumerator RecoverFromKnockBack()
     {
         yield return new WaitForSeconds(2.0f);

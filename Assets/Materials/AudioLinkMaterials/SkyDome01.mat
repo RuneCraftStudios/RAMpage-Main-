@@ -26,7 +26,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AudioLink_Texture:
-        m_Texture: {fileID: 2800000, guid: 0e5758aa4d2702f4486238f9f909b238, type: 3}
+        m_Texture: {fileID: 2800000, guid: 672c3ed758b9f3d43b6f6a4308f73cda, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:

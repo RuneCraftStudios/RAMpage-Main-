@@ -60,7 +60,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Main_Texture:
-        m_Texture: {fileID: 2800000, guid: 672c3ed758b9f3d43b6f6a4308f73cda, type: 3}
+        m_Texture: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -124,9 +124,9 @@ Material:
     - _QueueOffset: 0
     - _RMS: 0
     - _ReceiveShadows: 0
-    - _RippleCount: 1
+    - _RippleCount: 2
     - _RippleSpeed: 0.1
-    - _RippleStrength: 0.75
+    - _RippleStrength: 1
     - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -147,7 +147,7 @@ Material:
     - _RippleCenter: {r: 0, g: 0, b: 0, a: 0}
     - _RippleCenter2D: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _Tiling: {r: 15, g: 8, b: 0, a: 0}
+    - _Tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &1059071712604358558
 MonoBehaviour:

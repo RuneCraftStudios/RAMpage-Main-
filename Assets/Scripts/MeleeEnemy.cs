@@ -1,45 +1,39 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MeleeEnemy : EnemyAiTutorial
 {
-    public Collider WeaponColliderRight;
-    public Collider WeaponColliderLeft;
+    [Header("Melee Enemy Settings")]
+    public Collider WeaponCollider; // Single collider for melee attacks
     public int damage = 10;
-    public float damageCooldownTime = 1f; // Cooldown time between consecutive damage dealing
-    public LayerMask targetLayers; // LayerMask to specify which layers to check for collisions
-    private bool canDealDamage = true; // Flag to track if the weapon can deal damage
-    [SerializeField] private bool IsHeavy;
-    [SerializeField] private float knockbackForce;
-    [SerializeField] private float knockbackbuffer;
+    public LayerMask targetLayers;
+    public bool IsHeavy;
+    public float knockbackForce;
+    public AnimationClip AttackAnimation;
+    private bool canDealDamage = true; // Flag to control damage for the weapon
+
     public void AttackPlayer()
     {
         if (!playerInAttackRange)
         {
-            ChangeState(EnemyState.Decision);
             return;
         }
-        StartCoroutine(ChangeStateAfterAttack());   
+        StartCoroutine(ChangeStateAfterAttack());
     }
+
     private void OnTriggerEnter(Collider other)
     {
-        if (!playerInAttackRange)
-        {
-            ChangeState(EnemyState.Decision);
-        }
-
-        if (((1 << other.gameObject.layer) & targetLayers) == 0) return; // Early exit if the object isn't in the target layer
+        if (((1 << other.gameObject.layer) & targetLayers) == 0) return; // Exit if not the target layer
+        if (!WeaponCollider.enabled || !canDealDamage) return; // Damage only if the collider is active and damage is allowed
 
         if (other.CompareTag("Player"))
         {
-            // Logic for when hitting the player
-            Health playerHealth = other.GetComponentInParent<Health>();
-            if (playerHealth != null && canDealDamage)
+            Health playerHealth = other.GetComponent<Health>();
+            if (playerHealth != null)
             {
                 playerHealth.TakeDamage(damage);
-                // Apply any player-specific effects here
-                ProcessAttackEnd();
+                ApplyKnockbackIfHeavy(other);
+                canDealDamage = false; // Prevent further damage until reset
             }
         }
     }
@@ -47,38 +41,34 @@ public class MeleeEnemy : EnemyAiTutorial
     private void ApplyKnockbackIfHeavy(Collider other)
     {
         if (!IsHeavy) return;
-
-        // Knockback logic remains the same
-        EnemyAiTutorial enemyAi = other.GetComponentInParent<EnemyAiTutorial>();
-        if (enemyAi != null)
+        CharacterController playerController = other.GetComponentInParent<CharacterController>();
+        if (playerController != null)
         {
             Vector3 knockbackDirection = (other.transform.position - transform.position).normalized;
-            Rigidbody enemyRigidbody = other.GetComponentInParent<Rigidbody>();
-            if (enemyRigidbody != null)
-            {
-                enemyRigidbody.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
-                enemyAi.KnockBack();
-            }
+            StartCoroutine(ApplyKnockback(playerController, knockbackDirection * knockbackForce, 0.5f));
         }
     }
 
-    private void ProcessAttackEnd()
+    IEnumerator ApplyKnockback(CharacterController controller, Vector3 knockback, float duration)
     {
-        canDealDamage = false;
-        WeaponColliderLeft.enabled = false;
-        WeaponColliderRight.enabled = false;
-        Invoke("ResetDamageCooldown", damageCooldownTime);
+        float time = 0;
+        while (time < duration)
+        {
+            controller.Move(knockback * Time.deltaTime);
+            time += Time.deltaTime;
+            yield return null;
+        }
     }
 
-    private void ResetDamageCooldown()
-    {
-        canDealDamage = true;
-        WeaponColliderLeft.enabled = true;
-        WeaponColliderRight.enabled = true;
-    }
     private IEnumerator ChangeStateAfterAttack()
     {
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(AttackAnimation.length);
+        ResetDamageCapability(); // Reset damage capability after the attack animation is complete
         ChangeState(EnemyState.Decision);
+    }
+
+    private void ResetDamageCapability()
+    {
+        canDealDamage = true; // Re-enable damage capability
     }
 }

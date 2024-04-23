@@ -8,16 +8,15 @@ public class ElementalEffect : MonoBehaviour
     public float effectDuration = 3f; // Duration of elemental effect
     public int damageOverTime = 5; // Base damage per second
     [Range(0f, 1f)]
-    public float effectChance = 1f; // Chance of elemental effect (100%)
+    public float effectChance = 1f; // Chance of elemental effect
 
-    // References to Health components
+
     private Health playerHealth;
-    private EnemyHealth enemyHealth; // Assume you have an EnemyHealth script similar to Health
+    private EnemyHealth enemyHealth; // Assume you have an EnemyHealth script
 
     // Method to simulate OnTriggerEnter for raycasts
     public void RaycastCollision(Vector3 hitPoint)
     {
-        // Perform a sphere cast to find colliders at the hit point
         Collider[] colliders = Physics.OverlapSphere(hitPoint, 0.1f);
         foreach (Collider collider in colliders)
         {
@@ -25,13 +24,11 @@ public class ElementalEffect : MonoBehaviour
         }
     }
 
-    // Called when the projectile collides with another collider
     void OnTriggerEnter(Collider other)
     {
         ApplyEffectBasedOnTag(other);
     }
 
-    // Method to apply elemental effect based on tag
     private void ApplyEffectBasedOnTag(Collider collider)
     {
         if (collider.CompareTag("Player"))
@@ -46,25 +43,24 @@ public class ElementalEffect : MonoBehaviour
         }
     }
 
-    // Method to apply elemental effect
     private void ApplyElementalEffect()
     {
         if (elementType == ElementType.Fire || elementType == ElementType.Electricity)
         {
-            // This method is kept generic for both player and enemy
-            // Directly start DamageOverTime
             if (playerHealth != null)
             {
                 playerHealth.StartDamageOverTime(damageOverTime, effectDuration);
+                // Assume player damage text management is handled separately
             }
             else if (enemyHealth != null)
             {
                 enemyHealth.StartDamageOverTime(damageOverTime, effectDuration);
+                enemyHealth.GetComponent<DamageTextController>().DisplayDamage(damageOverTime, elementType.ToString());
             }
         }
     }
 
-    // Apply the effect if conditions are met and clear health references
+
     private void ApplyEffectToHealth(Health healthComponent)
     {
         if (healthComponent != null && Random.value <= effectChance)
@@ -77,12 +73,10 @@ public class ElementalEffect : MonoBehaviour
         playerHealth = null; // Clear reference
     }
 
-    // Similar to ApplyEffectToHealth but for enemy health component
     private void ApplyEffectToEnemyHealth(EnemyHealth enemyHealthComponent)
     {
         if (enemyHealthComponent != null && Random.value <= effectChance)
         {
-            // Assume enemy health has similar functionality or adapt as needed
             ApplyElementalEffect();
         }
         enemyHealth = null; // Clear reference

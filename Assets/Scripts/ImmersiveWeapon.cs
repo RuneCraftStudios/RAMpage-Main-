@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 
 public class ImmersiveWeapon : MonoBehaviour
@@ -15,56 +11,50 @@ public class ImmersiveWeapon : MonoBehaviour
     public AudioSource AudioSource;
 
     [Header("AudioClip Inputs")]
-    public AudioClip ChargingUpClip;
     public AudioClip ShootClip;
-    public AudioClip DisengageClip;
     public AudioClip NoEnergyClip;
-
-    [Header("Weapon Animator")]
-    public Animator Animator;
 
     [Header("Weapon Attributes")]
     public int EnergyCost;
+    public float RecoilForceMagnitude;  // Magnitude of the recoil force
+    public float RecoilTorqueMagnitude; // Magnitude of the recoil torque
 
     public Health Health;
+    private Rigidbody weaponRigidbody;
 
     void Start()
     {
         XRGrabInteractable grabbable = GetComponent<XRGrabInteractable>();
         grabbable.activated.AddListener(FireBullet);
-        int energy = Health.CurrentEnergy;
+        weaponRigidbody = GetComponent<Rigidbody>();
     }
+
     public void FireBullet(ActivateEventArgs Arg)
     {
-        
-        if (ChargingUpClip != null)
+        if (Health.CurrentEnergy >= EnergyCost)
         {
-            AudioSource.PlayOneShot(ChargingUpClip);
-            Animator.Play("ChargingUp");
+            GameObject spawnedBullet = Instantiate(Bullet, MuzzleTransform.position, MuzzleTransform.rotation);
+            AudioSource.PlayOneShot(ShootClip);
+            ConsumeEnergy();
+            ApplyRecoil();
         }
-        int energy = Health.CurrentEnergy;
+        else
+        {
+            AudioSource.PlayOneShot(NoEnergyClip);
+        }
+    }
 
-        Animator.Play("Shoot");
-        // Instantiate the bullet, play audio, and trigger animation as before...
-        GameObject spawnedBullet = Instantiate(Bullet, MuzzleTransform.position, MuzzleTransform.rotation);
-        spawnedBullet.transform.Rotate(Vector3.up, 0f);
-        AudioSource.PlayOneShot(ShootClip);
-        ConsumeEnergy();
+    private void ApplyRecoil()
+    {
+        // Applying backward force
+        weaponRigidbody.AddRelativeForce(Vector3.back * RecoilForceMagnitude, ForceMode.Impulse);
+
+        // Applying rotational torque
+        weaponRigidbody.AddRelativeTorque(Vector3.right * RecoilTorqueMagnitude, ForceMode.Impulse);
     }
 
     public void ConsumeEnergy()
     {
         Health.DepleteEnergy(EnergyCost);
     }
-
-    public void Disengage()
-    {
-        if (!DisengageClip)
-        {
-            AudioSource.PlayOneShot(DisengageClip);
-        }
-        
-    }
-
-    
 }

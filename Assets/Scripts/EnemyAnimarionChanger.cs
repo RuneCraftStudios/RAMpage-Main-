@@ -37,7 +37,6 @@ public class EnemyAnimationChanger : MonoBehaviour
         switch (state)
         {
             case EnemyState.WaitingToBeSpawned:
-                PlayAnimationWithBlend("Patrol");
                 break;
             case EnemyState.Patrol:
                 PlayAnimationWithBlend("Patrol");
@@ -63,9 +62,6 @@ public class EnemyAnimationChanger : MonoBehaviour
             case EnemyState.Die:
                 PlayAnimationWithBlend("Die");
                 break;
-            default:
-                // Handle any other states if needed
-                break;
         }
     }
 
@@ -75,6 +71,6 @@ public class EnemyAnimationChanger : MonoBehaviour
         {
             enemyAi.animator.CrossFadeInFixedTime(animationName, blendTimer);
         }
-       
+
     }
 }

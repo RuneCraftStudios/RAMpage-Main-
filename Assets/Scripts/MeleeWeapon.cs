@@ -3,19 +3,39 @@ using UnityEngine;
 public class MeleeWeapon : MonoBehaviour
 {
     public int damage = 10;
-    public float damageCooldownTime = 1f; // Cooldown time between consecutive damage dealing
-    public LayerMask targetLayers; // LayerMask to specify which layers to check for collisions
-
+    public float damageCooldownTime = 1f; 
+    public LayerMask targetLayers; 
     private Collider weaponCollider;
-    private bool canDealDamage = true; // Flag to track if the weapon can deal damage
+    private bool canDealDamage = true;
     [SerializeField] private bool IsHeavy;
     [SerializeField] private float knockbackForce;
     [SerializeField] private float knockbackbuffer;
+    public WeaponSoundManager weaponSoundManager;
+    public int EnergyCost;
+    public Health health;
 
 
     private void Start()
     {
-        weaponCollider = GetComponent<Collider>();
+        // Get all colliders attached to the object
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+
+        // Check if there are any colliders
+        if (colliders.Length > 0)
+        {
+            // Assign the first collider found to the weaponCollider variable
+            weaponCollider = colliders[0];
+
+            // If there are multiple colliders, enable them all
+            for (int i = 1; i < colliders.Length; i++)
+            {
+                colliders[i].enabled = true;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No collider found on MeleeWeapon object.");
+        }
     }
 
     // Called when the trigger collider attached to the weapon GameObject overlaps with another collider
@@ -30,8 +50,11 @@ public class MeleeWeapon : MonoBehaviour
             if (targetHealth != null && canDealDamage)
             {
                 targetHealth.TakeDamage(damage);
+                weaponSoundManager.PlayWeaponImpactClips();
                 ApplyKnockbackIfHeavy(other);
                 ProcessAttackEnd();
+                Health health = GetComponent<Health>();
+                health.DepleteEnergy(EnergyCost);
             }
         }
         else if (other.CompareTag("Player"))
@@ -41,6 +64,7 @@ public class MeleeWeapon : MonoBehaviour
             if (playerHealth != null && canDealDamage)
             {
                 playerHealth.TakeDamage(damage);
+                weaponSoundManager.PlayWeaponImpactClips();
                 // Apply any player-specific effects here
                 ProcessAttackEnd();
             }

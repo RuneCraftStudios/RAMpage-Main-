@@ -4904,7 +4904,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5297629108809931170
 Transform:
@@ -5012,7 +5012,7 @@ MonoBehaviour:
   ExplosionEffect: {fileID: 247743264397742244}
   ExplosionEffectDuration: 0.3
   AudioSource: {fileID: 972439875391746709}
-  ExplosionClip: {fileID: 8300000, guid: ad0aa01bd31cb5e4691a6034841b5927, type: 3}
+  ExplosionClip: {fileID: 8300000, guid: b8ef3444882f0994e90b1b4b6eedc005, type: 3}
   MeshRenderer: {fileID: 832790435512159527}
 --- !u!1 &5968933143607697584
 GameObject:

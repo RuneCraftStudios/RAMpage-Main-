@@ -37,6 +37,7 @@ public class EnemyAnimationChanger : MonoBehaviour
         switch (state)
         {
             case EnemyState.WaitingToBeSpawned:
+                
                 break;
             case EnemyState.Patrol:
                 PlayAnimationWithBlend("Patrol");

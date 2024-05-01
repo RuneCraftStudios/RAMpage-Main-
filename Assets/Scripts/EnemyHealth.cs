@@ -22,13 +22,13 @@ public class EnemyHealth : MonoBehaviour
     private Coroutine damageOverTimeCoroutine = null;
     [SerializeField] private float DeathAnimationTime;
 
-    [Header("Audio")]
-    [SerializeField] private AudioSource AudioSource;
-    [SerializeField] private AudioClip TakeDamageClip;
-
     private Coroutine electrifiedCoroutine;
     private Coroutine ignitedCoroutine;
     private Queue<int> damageQueue = new Queue<int>();
+    private DamageTextController damageTextController;
+    public EnemyParametersUI enemyParametersUI;
+
+    private EnemySoundManager enemySoundManager;
     public EnemyAiTutorial enemyAi;
     public int CurrentHealth
     {
@@ -50,6 +50,7 @@ public class EnemyHealth : MonoBehaviour
         currentShield = maxShield;
         currentEnergy = maxEnergy;
         lastDamageTime = Time.time;
+        EnemySoundManager enemySoundManager = GetComponent<EnemySoundManager>();
     }
     private void Update()
     {
@@ -65,6 +66,7 @@ public class EnemyHealth : MonoBehaviour
             {
                 currentShield = Mathf.Min(currentShield + 1, maxShield);
                 currentRechargeAmount -= 1f;
+                UpdateUI();
             }
         }
 
@@ -87,6 +89,7 @@ public class EnemyHealth : MonoBehaviour
         {
             // Apply damage to shield
             currentShield -= damage;
+            UpdateUI();
             if (currentShield < 0)
             {
                 currentShield = 0;
@@ -96,6 +99,7 @@ public class EnemyHealth : MonoBehaviour
         {
             // Apply damage to health directly
             currentHealth -= damage;
+            UpdateUI();
             if (currentHealth <= 0)
             {
                 enemyAi.ChangeState(EnemyState.Die);
@@ -104,14 +108,27 @@ public class EnemyHealth : MonoBehaviour
 
         // Update lastDamageTime to current time
         lastDamageTime = Time.time;
-
+        DamageTextController damageTextController = GetComponent<DamageTextController>();
+        if (damageTextController != null)
+        {
+            damageTextController.DisplayDamage(damage);
+        }
+        
         // Apply elemental effects
-
-        AudioSource.PlayOneShot(TakeDamageClip);
+        EnemySoundManager enemySoundManager = GetComponent<EnemySoundManager>();
+        if (enemySoundManager != null) 
+        {
+            enemySoundManager.PlayEnemyTakeDamageSound();
+        }
+        
+       
+        
     }
-
-
-
+    private void UpdateUI()
+    {
+        enemyParametersUI.UpdateHealthBar(currentHealth, maxHealth);
+        enemyParametersUI.UpdateShieldBar(currentShield, maxShield);
+    }
 
     public void StartDamageOverTime(int damagePerSecond, float duration)
     {
@@ -124,7 +141,7 @@ public class EnemyHealth : MonoBehaviour
 
         while (timer < effectDuration)
         {
-            
+
             // Apply damage over time
             TakeDamage(damageOverTime); // Using TakeDamage ensures shield/health logic is centralized
 
@@ -147,17 +164,20 @@ public class EnemyHealth : MonoBehaviour
     {
         // Increase current health by the specified amount
         currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
+        UpdateUI();
     }
 
     public void RestoreShield(int amount)
     {
         // Increase current shield by the specified amount
         currentShield = Mathf.Min(currentShield + amount, maxShield);
+        UpdateUI();
     }
 
     public void RestoreEnergy(float amount)
     {
         // Increase current energy by the specified amount
         currentEnergy = Mathf.Min(currentEnergy + (int)amount, maxEnergy);
+        
     }
 }

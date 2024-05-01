@@ -9,6 +9,10 @@ public class Hammer : MonoBehaviour
     public Transform forceApplyLocation; // Assign this in the Unity Inspector
     public float forceMagnitude = 10.0f; // You can adjust the magnitude in the Inspector
     public Vector3 forceDirection = Vector3.forward; // Default direction of the force
+    public GameObject SkillCollider;
+    public GameObject ImpactEffect;
+    private Collider weaponCollider;
+
 
     // Start is called before the first frame update
     void Start()
@@ -16,6 +20,8 @@ public class Hammer : MonoBehaviour
         XRGrabInteractable grabbable = GetComponent<XRGrabInteractable>();
         grabbable.activated.AddListener(Rocket);
         weaponRigidbody = GetComponent<Rigidbody>();
+        SkillCollider = GetComponent<GameObject>();
+        weaponCollider = GetComponent<Collider>();
     }
 
     // Update is called once per frame
@@ -26,6 +32,15 @@ public class Hammer : MonoBehaviour
         {
             Vector3 worldForceDirection = forceApplyLocation.TransformDirection(forceDirection.normalized);
             weaponRigidbody.AddForceAtPosition(worldForceDirection * forceMagnitude, forceApplyLocation.position);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Ground"))
+        {
+            SkillCollider.SetActive(true);
+            Instantiate(ImpactEffect, other.transform, other.transform);
         }
     }
 }

@@ -76,6 +76,8 @@ public class EnemyAiTutorial : MonoBehaviour
     public GameObject Projectile;
     public Transform[] muzzleTransforms;
 
+    public EnemySoundManager enemySoundManager;
+
     //Numerator&CourotineReferences
     public Coroutine checkPlayerCoroutine;
     public IEnumerator searchWalkPointCoroutine;
@@ -100,6 +102,7 @@ public class EnemyAiTutorial : MonoBehaviour
         GameObject playerGameObject = GameObject.Find("Player");
         agent = GetComponent<NavMeshAgent>();
         health = GetComponent<EnemyHealth>();
+        EnemySoundManager enemySoundManager = GetComponent<EnemySoundManager>();
 
         if (playerGameObject != null)
         {
@@ -158,26 +161,23 @@ public class EnemyAiTutorial : MonoBehaviour
             case EnemyState.KnockBack:
                 break;
             case EnemyState.Relocating:
-                
                 break;
             case EnemyState.ThrowingGrenade:
                 break;
             case EnemyState.Decision:
                 break;
-            
             case EnemyState.Die:
                 break;
         }
-        
     }
     public void ChangeState(EnemyState newState)
     {
+        EnemySoundManager enemySoundManager = GetComponent<EnemySoundManager>();
         currentState = newState;
         if (currentState == EnemyState.WaitingToBeSpawned)
         {
-            StartCoroutine(EnableMeshRenderersAfterDelay(1f));
+            ChangeState(EnemyState.Decision);
         }
-
         if (currentState == EnemyState.Relocating)
         {
             EvasiveEnemy evasiveEnemy = GetComponent<EvasiveEnemy>();
@@ -192,7 +192,7 @@ public class EnemyAiTutorial : MonoBehaviour
             {
                 agent.isStopped = false;
                 agent.speed = 20f;
-                StartCoroutine(evasiveEnemy.Relocate());
+                evasiveEnemy.Relocate();
             }
             
         }
@@ -210,15 +210,18 @@ public class EnemyAiTutorial : MonoBehaviour
             agent.isStopped = false;
             agent.speed = patrolSpeed;
             Patroling();
+            enemySoundManager.PlayEnemyLocateSound();
         }
         if (currentState == EnemyState.Chase)
         {
             agent.isStopped = false;
             agent.speed = chaseSpeed;
             ChasePlayer();
+            enemySoundManager.PlayEnemySearchSound();
         }
         if (currentState == EnemyState.Attack)
         {
+            enemySoundManager.PlayEnemyTargetSightedSound();
             SelectAttackMethod();
             //Debug.Log("AttackStateCalled");
         }
@@ -242,13 +245,16 @@ public class EnemyAiTutorial : MonoBehaviour
 
         if (currentState == EnemyState.Die)
         {
+            StopAllCoroutines();
             agent.isStopped = true;
             sightRange = 0;
             attackRange = 0;
             StartCoroutine(DieAfterBufferTime());
+            enemySoundManager.PlayEnemyDeathSound();
         }
 
     }
+
     private void Patroling()
     {
         if (!playerInSightRange)
@@ -296,6 +302,10 @@ public class EnemyAiTutorial : MonoBehaviour
             {
                 //Debug.Log("Transition to Patrol State");
                 ChangeState(EnemyState.Patrol);
+            }
+            else if (evasiveEnemy.playerInEvasionRange)
+            {
+                ChangeState(EnemyState.Relocating);
             }
         }
 
@@ -389,14 +399,17 @@ public class EnemyAiTutorial : MonoBehaviour
     }
     IEnumerator DieAfterBufferTime()
     {
+
         ExplodingEnemy explodingEnemy = GetComponent<ExplodingEnemy>();
         if (explodingEnemy != null)
         {
             Die();
+            enemySoundManager.PlayEnemyDeathSound();
         }
         else
         {
             yield return new WaitForSeconds(DieAnimationClip.length);
+            enemySoundManager.PlayEnemyDeathSound();
             Die();
         }
     }
@@ -427,36 +440,7 @@ public class EnemyAiTutorial : MonoBehaviour
         yield return new WaitForSeconds(2f);
         ChangeState(EnemyState.Decision);
     }
-    private bool PlayerInSightRange()
-    {
-        bool playerSeen = false;
-        LayerMask combinedLayerMask = PlayerLayer | ~ignoreRaycastLayer;
-        Collider[] targetsInViewRadius = Physics.OverlapSphere(gazeObject.transform.position, sightRange, combinedLayerMask);
-
-        foreach (Collider targetCollider in targetsInViewRadius)
-        {
-
-            if (targetCollider.CompareTag("Player"))
-            {
-                playerSeen = true;
-                continue;
-            }
-
-            Vector3 directionToTarget = (targetCollider.transform.position - gazeObject.transform.position).normalized;
-
-            if (Vector3.Angle(gazeObject.transform.forward, directionToTarget) < fieldOfViewAngle / 2)
-            {
-
-                if (!Physics.Raycast(gazeObject.transform.position, directionToTarget, out RaycastHit hit, sightRange, ObstacleLayers))
-                {
-                    playerSeen = true;
-                    break;
-                }
-            }
-        }
-
-        return playerSeen;
-    }
+    
     private void OnDrawGizmosSelected()
     {
         // Draw sight range sphere
@@ -476,36 +460,7 @@ public class EnemyAiTutorial : MonoBehaviour
         }
 
     }
-    private IEnumerator EnableMeshRenderersAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        // Enable all mesh renderers
-        foreach (var renderer in meshRenderers)
-        {
-            if (renderer != null)
-            {
-                renderer.enabled = true;
-            }
-        }
-        foreach (var skinnedRenderer in skinnedMeshRenderers)
-        {
-            if (skinnedRenderer != null)
-            {
-                skinnedRenderer.enabled = true;
-            }
-        }
-        foreach (var collider in enemyColliders)
-        {
-            if (collider != null)
-            {
-                collider.enabled = true;
-            }
-        }
-
-        ChangeState(EnemyState.Decision);
-    }
-
+    
     private IEnumerator RecoverFromStun(float StunDuration)
     {
         yield return new WaitForSeconds(StunDuration);
@@ -544,6 +499,7 @@ public class EnemyAiTutorial : MonoBehaviour
     private IEnumerator CheckPlayerPresence()
     {
         //Debug.Log("CheckPlayerPresence coroutine started.");
+        EvasiveEnemy evasiveEnemy = GetComponent<EvasiveEnemy>();
 
         while (true)
         {

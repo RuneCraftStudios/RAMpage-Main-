@@ -13,10 +13,10 @@ public class DamageTextController : MonoBehaviour
         ClearAllTexts(); // Ensure all texts are empty on start
     }
 
-    public void DisplayDamage(int damage, string type)
+    public void DisplayDamage(int damage)
     {
         StopAllCoroutines(); // Stop any previous animations or clears
-        TextMeshPro selectedText = SelectTextComponent(type);
+        TextMeshPro selectedText = baseDamageText;
         if (selectedText != null)
         {
             selectedText.text = damage.ToString();
@@ -28,19 +28,6 @@ public class DamageTextController : MonoBehaviour
     {
         yield return new WaitForSeconds(2f); // Wait for 2 seconds
         textComponent.text = ""; // Then clear the text
-    }
-
-    private TextMeshPro SelectTextComponent(string damageType)
-    {
-        switch (damageType)
-        {
-            case "Fire":
-                return fireDamageText;
-            case "Electricity":
-                return electricityDamageText;
-            default:
-                return baseDamageText; // Default to base damage
-        }
     }
 
     private void ClearAllTexts()

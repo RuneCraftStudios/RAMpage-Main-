@@ -12,6 +12,7 @@ public class ChargeStation : MonoBehaviour
     public int spawnNumber = 1;
     public float spawnFrequency = 5.0f;
     public Animator animator;
+    public float CoolDown;
 
     [Header("Regeneration")]
     public float regenInterval = 5.0f;
@@ -108,7 +109,6 @@ public class ChargeStation : MonoBehaviour
         if (!regenProcessActive)
         {
             regenProcessActive = true;
-            animator.SetBool("RegenProcessActive", true);
             continueRegeneration = true; // Reset the flag to ensure proper regeneration
             StartCoroutine(RegenerateCapacity()); // Start or restart the regeneration coroutine
 
@@ -118,7 +118,8 @@ public class ChargeStation : MonoBehaviour
     private IEnumerator RegenerateCapacity()
     {
         // Wait for the initial buffer time before starting the regeneration process
-        yield return new WaitForSeconds(regenInterval);
+        yield return new WaitForSeconds(CoolDown);
+        animator.SetBool("RegenProcessActive", true);
 
         while (currentCapacity < maxCapacity && continueRegeneration) // Check continueRegeneration flag
         {

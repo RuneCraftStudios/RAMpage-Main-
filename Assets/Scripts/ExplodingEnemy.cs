@@ -6,12 +6,11 @@ using UnityEngine.UIElements;
 public class ExplodingEnemy : EnemyAiTutorial
 {
     [Header("Exploding Enemy Settings")]
-    public AudioSource AudioSource;
-    public AudioClip ExplosionClip;
-    public AudioClip ChargeClip;
     public ParticleSystem ExplosionEffect;
     public int ExplosionDamage;
     private bool canExplode = false;
+    private EnemySoundManager soundManager;
+    public float chargeSpeed;
 
     public void AttackPlayer()
     {
@@ -30,7 +29,7 @@ public class ExplodingEnemy : EnemyAiTutorial
             {
                 playerHealth.TakeDamage(ExplosionDamage);
                 Instantiate(ExplosionEffect, transform.position, Quaternion.identity);
-                AudioSource.PlayOneShot(ExplosionClip);
+                enemySoundManager.PlayEnemyExplodeSound();
                 ChangeState(EnemyState.Die);
             }
         }
@@ -40,11 +39,11 @@ public class ExplodingEnemy : EnemyAiTutorial
         Debug.Log("ChargeActionCalled");
         yield return new WaitForSeconds(2.0f);
         agent.isStopped = false;
-        agent.speed = 6.0f;
+        agent.speed = chargeSpeed;
         canExplode = true;
-        AudioSource.PlayOneShot(ChargeClip);
+        enemySoundManager.PlayEnemyChargeSound();
+
+
+
     }
-    
-
-
 }

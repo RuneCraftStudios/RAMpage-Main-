@@ -120,9 +120,9 @@ public class RangedEnemy : EnemyAiTutorial
 
 
     private void InstantiateProjectile(Transform muzzleTransform)
-    {
-        
+    { 
         Instantiate(Projectile, muzzleTransform.position, muzzleTransform.rotation);
+        enemySoundManager.PlayEnemyAttackSound();
     }
 
     private void Aim(Vector3 directionToPlayer, Transform muzzleTransform)
@@ -143,6 +143,7 @@ public class RangedEnemy : EnemyAiTutorial
             Debug.Log("Relocating...");
             // After waiting, move to the walkpoint
             agent.SetDestination(walkpoint);
+            enemySoundManager.PlayEnemyRelocateSound();
             StartCoroutine(RelocateRoutine()); // Start the relocation routine
         }
         else
@@ -167,6 +168,7 @@ public class RangedEnemy : EnemyAiTutorial
         Debug.Log("Throwing Grenade..."); // Add this line to check if this method is being called
         GameObject grenadeInstance = Instantiate(grenade, muzzleTransforms[0].position, Quaternion.identity);
         StartCoroutine(ThrowGrenadeRoutine());
+        enemySoundManager.PlayEnemyGrenadeSound();
     }
 
     public IEnumerator ThrowGrenadeRoutine()

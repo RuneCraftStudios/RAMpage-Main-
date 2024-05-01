@@ -55,7 +55,6 @@ public class ElementalEffect : MonoBehaviour
             else if (enemyHealth != null)
             {
                 enemyHealth.StartDamageOverTime(damageOverTime, effectDuration);
-                enemyHealth.GetComponent<DamageTextController>().DisplayDamage(damageOverTime, elementType.ToString());
             }
         }
     }

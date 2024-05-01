@@ -36,6 +36,17 @@ public class MeleeWeapon : MonoBehaviour
         {
             Debug.LogWarning("No collider found on MeleeWeapon object.");
         }
+
+        GameObject playerGameObject = GameObject.Find("Player");
+        if (playerGameObject != null)
+        {
+            // Get the Health component from the player GameObject
+            health = playerGameObject.GetComponent<Health>();
+        }
+        else
+        {
+            Debug.LogError("Player GameObject not found!");
+        }
     }
 
     // Called when the trigger collider attached to the weapon GameObject overlaps with another collider
@@ -53,8 +64,8 @@ public class MeleeWeapon : MonoBehaviour
                 weaponSoundManager.PlayWeaponImpactClips();
                 ApplyKnockbackIfHeavy(other);
                 ProcessAttackEnd();
-                Health health = GetComponent<Health>();
                 health.DepleteEnergy(EnergyCost);
+         
             }
         }
         else if (other.CompareTag("Player"))

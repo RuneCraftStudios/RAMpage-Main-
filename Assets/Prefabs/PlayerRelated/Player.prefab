@@ -1207,6 +1207,7 @@ GameObject:
   - component: {fileID: 7557465635814500155}
   - component: {fileID: 4321459639187920436}
   - component: {fileID: 3776559648926005620}
+  - component: {fileID: 8786537065191462949}
   m_Layer: 5
   m_Name: RadialMainMenuUI
   m_TagString: Untagged
@@ -1222,7 +1223,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2963642637667362979}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1.118}
+  m_LocalPosition: {x: 0, y: 0, z: 0.41}
   m_LocalScale: {x: 0.001, y: 0.001, z: 0.001}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -1231,7 +1232,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0.035}
   m_SizeDelta: {x: 258, y: 465}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &7557465635814500155
@@ -1297,6 +1298,33 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &8786537065191462949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2963642637667362979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8523a34a53a5d2143abe977d5f961aa0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  menuButtonAction:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Menu Button
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: e96f859d-4e2e-4466-a259-b8115213b76a
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: -5627741252876500554, guid: c348712bda248c246b8c49b3db54643f,
+      type: 3}
+  holdDuration: 3
+  radialFillImage: {fileID: 5223735965849336051}
 --- !u!1 &3083847194486986976
 GameObject:
   m_ObjectHideFlags: 0
@@ -1839,7 +1867,7 @@ MonoBehaviour:
   m_UpdateTrackingType: 0
   m_EnableInputTracking: 1
   m_EnableInputActions: 1
-  m_ModelPrefab: {fileID: 3439912388192106887, guid: 427be104b4d18d64597caf64d500e637,
+  m_ModelPrefab: {fileID: 919494319177842451, guid: 427be104b4d18d64597caf64d500e637,
     type: 3}
   m_ModelParent: {fileID: 6295109348569573081}
   m_Model: {fileID: 0}
@@ -2500,7 +2528,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13697f1b0e21b2e458223020fe8f6f7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 50
+  maxHealth: 999999
   maxShield: 50
   maxEnergy: 50
   rechargeDelay: 5

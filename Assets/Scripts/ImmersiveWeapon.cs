@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -6,20 +7,16 @@ public class ImmersiveWeapon : MonoBehaviour
     [Header("Select Bullet")]
     public GameObject Bullet;
     public Transform MuzzleTransform;
+    public GameObject MuzzleFlash;
 
-    [Header("Select Sound Source")]
-    public AudioSource AudioSource;
-
-    [Header("AudioClip Inputs")]
-    public AudioClip ShootClip;
-    public AudioClip NoEnergyClip;
+    public WeaponSoundManager SoundManager;
 
     [Header("Weapon Attributes")]
     public int EnergyCost;
     public float RecoilForceMagnitude;  // Magnitude of the recoil force
     public float RecoilTorqueMagnitude; // Magnitude of the recoil torque
 
-    public Health Health;
+    private Health health;
     private Rigidbody weaponRigidbody;
 
     void Start()
@@ -27,21 +24,40 @@ public class ImmersiveWeapon : MonoBehaviour
         XRGrabInteractable grabbable = GetComponent<XRGrabInteractable>();
         grabbable.activated.AddListener(FireBullet);
         weaponRigidbody = GetComponent<Rigidbody>();
+        GameObject playerGameObject = GameObject.Find("Player");
+        if (playerGameObject != null)
+        {
+            // Get the Health component from the player GameObject
+            health = playerGameObject.GetComponent<Health>();
+        }
+        else
+        {
+            Debug.LogError("Player GameObject not found!");
+        }
     }
 
     public void FireBullet(ActivateEventArgs Arg)
     {
-        if (Health.CurrentEnergy >= EnergyCost)
+        
+        if (health.CurrentEnergy > EnergyCost)
         {
             GameObject spawnedBullet = Instantiate(Bullet, MuzzleTransform.position, MuzzleTransform.rotation);
-            AudioSource.PlayOneShot(ShootClip);
+            InstantiateMuzzleFlash();
+            SoundManager.PlayWeaponShootClip();
             ConsumeEnergy();
             ApplyRecoil();
         }
         else
         {
-            AudioSource.PlayOneShot(NoEnergyClip);
+            SoundManager.PlayWeaponLowEnergyClip();
         }
+           
+    }
+
+    private void InstantiateMuzzleFlash()
+    {
+        GameObject muzzleFlashInstance = Instantiate(MuzzleFlash, MuzzleTransform.position, MuzzleTransform.rotation);
+        StartCoroutine(DestroyAfterDelay(muzzleFlashInstance, 0.15f));
     }
 
     private void ApplyRecoil()
@@ -55,6 +71,12 @@ public class ImmersiveWeapon : MonoBehaviour
 
     public void ConsumeEnergy()
     {
-        Health.DepleteEnergy(EnergyCost);
+        health.DepleteEnergy(EnergyCost);
+    }
+
+    private IEnumerator DestroyAfterDelay(GameObject obj, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Destroy(obj);
     }
 }

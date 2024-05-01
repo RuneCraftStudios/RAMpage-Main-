@@ -5009,7 +5009,8 @@ MonoBehaviour:
   explosionCollider: {fileID: 3009537937272988598}
   explosionRadius: 6
   explosionDamage: 25
-  ExplosionEffect: {fileID: 247743264397742244}
+  ExplosionEffect: {fileID: 1746244704300853204, guid: e7ad40a517795284d8d92c99cd8fdcb7,
+    type: 3}
   ExplosionEffectDuration: 0.3
   AudioSource: {fileID: 972439875391746709}
   ExplosionClip: {fileID: 8300000, guid: b8ef3444882f0994e90b1b4b6eedc005, type: 3}

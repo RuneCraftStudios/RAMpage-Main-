@@ -136,7 +136,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2
   m_DistanceCalculationMode: 1
   m_SelectMode: 0
   m_FocusMode: 1
@@ -580,6 +580,8 @@ MonoBehaviour:
   knockbackForce: 0
   knockbackbuffer: 0
   weaponSoundManager: {fileID: 2779617251308006235}
+  EnergyCost: 1
+  health: {fileID: 5183883371004019928, guid: 4b914d35fdb8a5149850b284a2225d6b, type: 3}
 --- !u!4 &9195351357309226912 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f4b3394d17234664f878eb7dbab9d656,

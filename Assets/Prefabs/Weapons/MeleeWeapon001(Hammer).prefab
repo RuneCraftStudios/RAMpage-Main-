@@ -45,7 +45,6 @@ GameObject:
   - component: {fileID: 2758542469073928280}
   - component: {fileID: 3264776087923408303}
   - component: {fileID: 4118520773748349341}
-  - component: {fileID: 7627043529697226191}
   - component: {fileID: 4080740172043087717}
   - component: {fileID: 655945245384346742}
   m_Layer: 19
@@ -73,6 +72,7 @@ Transform:
   - {fileID: 5156663314713960128}
   - {fileID: 8833199051831027175}
   - {fileID: 7157224790502541659}
+  - {fileID: 6812786038614388470}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &8568306987880163634
@@ -84,7 +84,7 @@ Rigidbody:
   m_GameObject: {fileID: 1154067742034818991}
   serializedVersion: 4
   m_Mass: 50
-  m_Drag: 0.25
+  m_Drag: 1
   m_AngularDrag: 15
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -116,7 +116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_InteractionManager: {fileID: 0}
   m_Colliders:
-  - {fileID: 7627043529697226191}
+  - {fileID: 0}
   - {fileID: 4080740172043087717}
   m_InteractionLayerMask:
     serializedVersion: 2
@@ -273,6 +273,8 @@ MonoBehaviour:
   knockbackForce: 50
   knockbackbuffer: 2
   weaponSoundManager: {fileID: 655945245384346742}
+  EnergyCost: 1
+  health: {fileID: 5183883371004019928, guid: 4b914d35fdb8a5149850b284a2225d6b, type: 3}
 --- !u!114 &4118520773748349341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,27 +290,9 @@ MonoBehaviour:
   forceApplyLocation: {fileID: 8833199051831027175}
   forceMagnitude: 15
   forceDirection: {x: 0, y: 0, z: 1}
---- !u!65 &7627043529697226191
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1154067742034818991}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.19133788, y: 1.728162, z: 0.12547407}
-  m_Center: {x: 0.009147763, y: 0.85074174, z: 0.0018295795}
+  SkillCollider: {fileID: 1970078772229769111}
+  ImpactEffect: {fileID: 1746244704300853204, guid: e7ad40a517795284d8d92c99cd8fdcb7,
+    type: 3}
 --- !u!65 &4080740172043087717
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -324,7 +308,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -383,6 +367,83 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5291046766627506307}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &1970078772229769111
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6812786038614388470}
+  - component: {fileID: 5813362106792469556}
+  - component: {fileID: 2240816414657845731}
+  m_Layer: 19
+  m_Name: GroundSlam
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &6812786038614388470
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970078772229769111}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.306, y: 1.904, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5291046766627506307}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5813362106792469556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970078772229769111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 787cb3bfaccdbac46a95c5217ef8d3a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 25
+  damageCooldownTime: 1
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 2048
+  IsHeavy: 1
+  knockbackForce: 25
+  knockbackbuffer: 1
+  weaponSoundManager: {fileID: 655945245384346742}
+  EnergyCost: 0
+  health: {fileID: 0}
+--- !u!135 &2240816414657845731
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970078772229769111}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 1.22
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4698931556621093747
 GameObject:
   m_ObjectHideFlags: 0

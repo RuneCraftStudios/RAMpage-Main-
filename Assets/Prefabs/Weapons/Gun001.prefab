@@ -103,7 +103,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -206,7 +206,7 @@ Transform:
   m_GameObject: {fileID: 3957327020253426989}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0854, z: 0.3227}
+  m_LocalPosition: {x: 0, y: 0.166, z: 0.808}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -256,6 +256,7 @@ GameObject:
   - component: {fileID: 2116121415593769453}
   - component: {fileID: 5698868772714759936}
   - component: {fileID: 4442537845376327298}
+  - component: {fileID: 899135549717120744}
   m_Layer: 19
   m_Name: Gun001
   m_TagString: Untagged
@@ -297,13 +298,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Bullet: {fileID: 5769944953533130351, guid: 56ee04ef54eee2b479d226c95093cb4f, type: 3}
   MuzzleTransform: {fileID: 3998355361695272647}
-  AudioSource: {fileID: 6416523297155981978}
-  ShootClip: {fileID: 8300000, guid: ab663c6eb22575c4ebd999b333b9cfba, type: 3}
-  NoEnergyClip: {fileID: 8300000, guid: 1aeb2ea9678137f45aef751cc74e5be2, type: 3}
+  MuzzleFlash: {fileID: 100000, guid: e442820ce8072c54aabffe29e4cd72e3, type: 3}
+  SoundManager: {fileID: 899135549717120744}
   EnergyCost: 1
   RecoilForceMagnitude: 2
   RecoilTorqueMagnitude: -2
-  Health: {fileID: 0}
 --- !u!54 &5698868772714759936
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -483,6 +482,26 @@ MonoBehaviour:
   m_StartingSingleGrabTransformers: []
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
+--- !u!114 &899135549717120744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6617189566968024396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 820e784cdf0fcc747b2ca7a5ab4b584d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WeaponAudioSource: {fileID: 6416523297155981978}
+  ShootClips:
+  - {fileID: 8300000, guid: 4db9f4b34f1c93f43b603f4fd2ffcabe, type: 3}
+  ChargeClips: []
+  LowEnergyClips:
+  - {fileID: 8300000, guid: 232ea889cdb966840beefcc97465f201, type: 3}
+  ImpactClips: []
+  pitchVariation: 0.1
 --- !u!1 &8576262432863166644
 GameObject:
   m_ObjectHideFlags: 0

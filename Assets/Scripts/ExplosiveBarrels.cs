@@ -50,7 +50,7 @@ public class ExplosiveBarrels : MonoBehaviour
         }
 
         MeshRenderer.enabled = false;
-        ExplosionEffect.SetActive(true);
+        InstantiateEffect();
         AudioSource.PlayOneShot(ExplosionClip);
         StartCoroutine(Delete());
     }
@@ -64,9 +64,12 @@ public class ExplosiveBarrels : MonoBehaviour
         Gizmos.DrawWireSphere(explosionCollider.transform.position, explosionRadius);
     }
 
+    private void InstantiateEffect()
+    {
+        Instantiate(ExplosionEffect, AudioSource.transform.position, AudioSource.transform.rotation);
+    }
     private IEnumerator Delete()
     {
-
         yield return new WaitForSeconds(3.0f);
         Destroy(gameObject);
     }

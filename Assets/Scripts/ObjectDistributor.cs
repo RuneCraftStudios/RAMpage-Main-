@@ -17,8 +17,12 @@ public class ObjectDistributor : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(randomPoint + Vector3.up * 100f, Vector3.down, out hit, Mathf.Infinity, NavMesh.AllAreas))
             {
+#if UNITY_EDITOR
+                // Editor-only code
                 GameObject prefabInstance = PrefabUtility.InstantiatePrefab(objectToDistributePrefab) as GameObject;
                 prefabInstance.transform.position = hit.point;
+#endif
+
             }
         }
     }

@@ -23,7 +23,8 @@ public class Health : MonoBehaviour
     private Coroutine damageOverTimeCoroutine = null;
     private GameManager GameManager;
     private Queue<int> damageQueue = new Queue<int>();
-    
+    public EnemyParametersUI enemyParametersUI;
+
 
     private void Awake()
     {
@@ -31,6 +32,7 @@ public class Health : MonoBehaviour
         currentShield = maxShield; // Initialize current shield to max shield
         currentEnergy = maxEnergy; // Initialize current energy to max energy
         lastDamageTime = Time.time; // Initialize lastDamageTime to current time
+        UpdateUI();
     }
     public int CurrentHealth
     {
@@ -60,6 +62,7 @@ public class Health : MonoBehaviour
             {
                 currentShield = Mathf.Min(currentShield + 1, maxShield);
                 currentRechargeAmount -= 1f;
+                UpdateUI();
             }
         }
 
@@ -75,6 +78,7 @@ public class Health : MonoBehaviour
         {
             DepleteEnergy(10); // Deplete energy by 10 units
             ConsumeEnergy = false; // Reset testDepleteEnergy
+            UpdateUI();
         }
     }
     public void QueueDamage(int damage)
@@ -83,6 +87,12 @@ public class Health : MonoBehaviour
         damageQueue.Enqueue(damage);
     }
 
+    private void UpdateUI()
+    {
+        enemyParametersUI.UpdateHealthBar(currentHealth, maxHealth);
+        enemyParametersUI.UpdateShieldBar(currentShield, maxShield);
+        enemyParametersUI.UpdateEnergyBar(currentEnergy, maxEnergy);
+    }
     public void TakeDamage(int damage)
     {
         if (currentShield > 0)
@@ -92,12 +102,14 @@ public class Health : MonoBehaviour
             if (currentShield < 0)
             {
                 currentShield = 0;
+                UpdateUI();
             }
         }
         else
         {
             // Apply damage to health directly
             currentHealth -= damage;
+            UpdateUI();
             if (currentHealth <= 0)
             {
                 Die();
@@ -124,6 +136,8 @@ public class Health : MonoBehaviour
             // Apply damage over time
             TakeDamage(damageOverTime); // Using TakeDamage ensures shield/health logic is centralized
 
+            UpdateUI();
+
             timer += 1f; // Assuming damage is applied every second
             yield return new WaitForSeconds(1f);
         }
@@ -144,18 +158,21 @@ public class Health : MonoBehaviour
     {
         // Increase current health by the specified amount
         currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
+        UpdateUI();
     }
 
     public void RestoreShield(int amount)
     {
         // Increase current shield by the specified amount
         currentShield = Mathf.Min(currentShield + amount, maxShield);
+        UpdateUI();
     }
 
     public void RestoreEnergy(float amount)
     {
         // Increase current energy by the specified amount
         currentEnergy = Mathf.Min(currentEnergy + (int)amount, maxEnergy);
+        UpdateUI();
     }
 
     void Die()

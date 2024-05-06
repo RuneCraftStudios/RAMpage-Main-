@@ -113,7 +113,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _High: 0
-    - _Metallic: 0
+    - _Metallic: 1
     - _Mid: 0
     - _OcclusionStrength: 1
     - _PITCH: 0
@@ -124,8 +124,8 @@ Material:
     - _ReceiveShadows: 1
     - _RippleCount: 0.01
     - _RippleSpeed: 0.15
-    - _RippleStrength: 1
-    - _Smoothness: 0.5
+    - _RippleStrength: 0.1
+    - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
@@ -145,7 +145,7 @@ Material:
     - _RippleCenter: {r: 0, g: 0, b: 0, a: 0}
     - _RippleCenter2D: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _Tiling: {r: 1, g: 1, b: 0, a: 0}
+    - _Tiling: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &8254982141593992499
 MonoBehaviour:

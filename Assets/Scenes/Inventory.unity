@@ -1769,6 +1769,9 @@ MonoBehaviour:
   IsHeavy: 0
   knockbackForce: 0
   knockbackbuffer: 0
+  weaponSoundManager: {fileID: 0}
+  EnergyCost: 0
+  health: {fileID: 0}
 --- !u!54 &1897340621
 Rigidbody:
   m_ObjectHideFlags: 0

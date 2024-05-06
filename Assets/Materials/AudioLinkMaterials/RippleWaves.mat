@@ -125,7 +125,7 @@ Material:
     - _RMS: 0
     - _ReceiveShadows: 0
     - _RippleCount: 0.446
-    - _RippleSpeed: 0.05
+    - _RippleSpeed: 0.1
     - _RippleStrength: 1
     - _Smoothness: 0
     - _SmoothnessTextureChannel: 0

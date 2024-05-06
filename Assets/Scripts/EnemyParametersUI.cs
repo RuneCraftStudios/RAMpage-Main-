@@ -5,6 +5,7 @@ public class EnemyParametersUI : MonoBehaviour
 {
     public Image healthBar;
     public Image shieldBar;
+    public Image energyBar;
 
     // Method to update health bar fill amount
     public void UpdateHealthBar(float currentHealth, float maxHealth)
@@ -23,6 +24,15 @@ public class EnemyParametersUI : MonoBehaviour
         {
             float shieldPercentage = currentShield / maxShield;
             shieldBar.fillAmount = shieldPercentage;
+        }
+    }
+
+    public void UpdateEnergyBar(float currentEnergy, float maxEnergy)
+    {
+        if (energyBar != null)
+        {
+            float energyPercentage = currentEnergy / maxEnergy;
+            energyBar.fillAmount = energyPercentage;
         }
     }
 }

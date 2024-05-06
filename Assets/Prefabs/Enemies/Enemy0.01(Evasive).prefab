@@ -1602,6 +1602,7 @@ MonoBehaviour:
   currentShield: 0
   currentEnergy: 0
   DeathAnimationTime: 3
+  enemyParametersUI: {fileID: 0}
   enemyAi: {fileID: 3815656583453455822}
 --- !u!114 &4125452489668057072
 MonoBehaviour:
@@ -2302,6 +2303,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3054528251248582556, guid: 4a8281c3101f1ae4f9a30fc11cebf541,
         type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3054528251248582556, guid: 4a8281c3101f1ae4f9a30fc11cebf541,
+        type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 5f8e76bd0bd0c4841a5151212a714c72, type: 2}
@@ -2315,6 +2321,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[2]
       value: 
       objectReference: {fileID: 2100000, guid: 5f8e76bd0bd0c4841a5151212a714c72, type: 2}
+    - target: {fileID: 3054528251248582556, guid: 4a8281c3101f1ae4f9a30fc11cebf541,
+        type: 3}
+      propertyPath: m_Materials.Array.data[3]
+      value: 
+      objectReference: {fileID: 2100000, guid: 87488caf49321c94f88466e4e52635de, type: 2}
     - target: {fileID: 3592319352040842157, guid: 4a8281c3101f1ae4f9a30fc11cebf541,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

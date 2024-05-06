@@ -1339,7 +1339,7 @@ MonoBehaviour:
   playerInAttackRange: 0
   StunDuration: 3
   isStunned: 0
-  Projectile: {fileID: 5769944953533130351, guid: 345cdff958e754d468c713876a236d76,
+  Projectile: {fileID: 5769944953533130351, guid: 30386e98869a27b46941dcb6ca448db6,
     type: 3}
   muzzleTransforms:
   - {fileID: 1439092767027093028}
@@ -1462,6 +1462,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthBar: {fileID: 1614049995714283358}
   shieldBar: {fileID: 619111098366914772}
+  energyBar: {fileID: 0}
 --- !u!1 &6455576985515934727
 GameObject:
   m_ObjectHideFlags: 0
@@ -2394,6 +2395,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3054528251248582556, guid: 4a8281c3101f1ae4f9a30fc11cebf541,
         type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3054528251248582556, guid: 4a8281c3101f1ae4f9a30fc11cebf541,
+        type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 0777c2b9c32c92f44b9e1b2a3595600b, type: 2}
@@ -2407,6 +2413,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[2]
       value: 
       objectReference: {fileID: 2100000, guid: 0777c2b9c32c92f44b9e1b2a3595600b, type: 2}
+    - target: {fileID: 3054528251248582556, guid: 4a8281c3101f1ae4f9a30fc11cebf541,
+        type: 3}
+      propertyPath: m_Materials.Array.data[3]
+      value: 
+      objectReference: {fileID: 2100000, guid: 87488caf49321c94f88466e4e52635de, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

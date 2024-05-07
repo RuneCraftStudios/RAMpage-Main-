@@ -228,6 +228,7 @@ public class EnemyAiTutorial : MonoBehaviour
         if (currentState == EnemyState.Decision)
         {
             agent.isStopped = true;
+            RotateTowardsPlayer();
             MakeDecision();
         }
         if (currentState == EnemyState.Stun)
@@ -424,10 +425,20 @@ public class EnemyAiTutorial : MonoBehaviour
 
     protected void RotateTowardsPlayer()
     {
-        agent.isStopped = false;
-        agent.speed = chaseSpeed;
-        agent.SetDestination(player.position);
+        GameObject playerGameObject = GameObject.Find("Player");
+
+        if (playerGameObject != null)
+        {
+            Vector3 directionToPlayer = playerGameObject.transform.position - transform.position;
+            Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
+            transform.rotation = targetRotation;
+        }
+        else
+        {
+            Debug.LogError("Player GameObject not found!");
+        }
     }
+
 
     public IEnumerator ReturnToDecision()
     {

@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public AudioSource SoundtrackAudioSource;
     public AudioClip levelclearClip;
     public List<GameObject> LevelDoors; // Changed to a list of GameObjects
+    public GameObject Elevator;
 
     [Header("GameOverSettings")]
     public GameObject gameOverUI; // UI element displayed when the player dies
@@ -88,6 +89,10 @@ public class GameManager : MonoBehaviour
                 door.SetActive(true);
             }
         }
+
+        Elevator.SetActive(true);
+
+
 
         ManagerAudioSource.PlayOneShot(levelclearClip);
         SoundtrackAudioSource.Stop();

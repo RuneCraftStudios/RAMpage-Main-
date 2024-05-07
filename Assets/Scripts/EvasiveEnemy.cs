@@ -85,15 +85,17 @@ public class EvasiveEnemy : EnemyAiTutorial
         // Destroy the projectile after a certain duration
         Destroy(projectileInstance, timeToMidpoint * 2); // Multiply by 2 to ensure enough time for the projectile to reach the player
 
-        StartCoroutine(ResetAttack());
+        StartCoroutine(ResetAttack(timeBetweenAttacks));
         StartCoroutine(ReturnToDecisionSlow());
     }
 
-    private IEnumerator ResetAttack()
+    private IEnumerator ResetAttack(float time)
     {
-        yield return new WaitForSeconds(timeBetweenAttacks);
+        yield return new WaitForSeconds(time);
         isAttacking = false;
+        
     }
+
 
     private void RotateEnemyTowardsPlayer()
     {

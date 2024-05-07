@@ -102,14 +102,12 @@ public class Health : MonoBehaviour
             if (currentShield < 0)
             {
                 currentShield = 0;
-                UpdateUI();
             }
         }
         else
         {
             // Apply damage to health directly
             currentHealth -= damage;
-            UpdateUI();
             if (currentHealth <= 0)
             {
                 Die();
@@ -118,9 +116,9 @@ public class Health : MonoBehaviour
 
         // Update lastDamageTime to current time
         lastDamageTime = Time.time;
-
+        UpdateUI();
         // Apply elemental effects
-        
+
     }
     public void StartDamageOverTime(int damagePerSecond, float duration)
     {
@@ -135,9 +133,6 @@ public class Health : MonoBehaviour
         {
             // Apply damage over time
             TakeDamage(damageOverTime); // Using TakeDamage ensures shield/health logic is centralized
-
-            UpdateUI();
-
             timer += 1f; // Assuming damage is applied every second
             yield return new WaitForSeconds(1f);
         }

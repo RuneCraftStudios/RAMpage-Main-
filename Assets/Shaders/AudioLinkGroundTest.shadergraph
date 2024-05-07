@@ -5531,9 +5531,9 @@
     "m_ShaderOutputName": "Max",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 20.0,
-        "y": 20.0,
-        "z": 20.0,
+        "x": 50.0,
+        "y": 50.0,
+        "z": 50.0,
         "w": 1.0
     },
     "m_DefaultValue": {

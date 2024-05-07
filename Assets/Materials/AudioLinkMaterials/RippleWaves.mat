@@ -124,9 +124,9 @@ Material:
     - _QueueOffset: 0
     - _RMS: 0
     - _ReceiveShadows: 0
-    - _RippleCount: 0.446
+    - _RippleCount: 0.1
     - _RippleSpeed: 0.1
-    - _RippleStrength: 1
+    - _RippleStrength: 0.15
     - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -147,7 +147,7 @@ Material:
     - _RippleCenter: {r: 0, g: 0, b: 0, a: 0}
     - _RippleCenter2D: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _Tiling: {r: 1, g: 1, b: 0, a: 0}
+    - _Tiling: {r: 5, g: 0.1, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &1059071712604358558
 MonoBehaviour:

@@ -84,6 +84,9 @@ MonoBehaviour:
   speed: 25
   accuracy: 0
   maxDistance: 100
+  ImpactEffect: {fileID: 5735073787233752961, guid: 563c2f43412765e48ab6fb75d7c3e6cb,
+    type: 3}
+  MaxLife: 5
   damage: 5
   explodeOnCollision: 0
   explosionRadius: 5

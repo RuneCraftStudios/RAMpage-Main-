@@ -63,6 +63,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Left Hand Rigged
       objectReference: {fileID: 0}
+    - target: {fileID: 2518479571587576427, guid: 2e74f264eeb271f43a5ed89921ffa58c,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 2946789a5f43b074c971a423e8ae31d2, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -7,12 +7,15 @@ public class Projectile : MonoBehaviour
     public float speed = 10f;
     public float accuracy = 5f;
     public float maxDistance = 100f;
+    public ParticleSystem ImpactEffect;
+    public float MaxLife;
+    public LayerMask CollusionLayers;
 
     [Header("Damage Settings")]
     public int damage = 10;
 
     [Header("Explosion Settings")]
-    [SerializeField] private bool explodeOnCollision = false;
+    [SerializeField] protected private bool explodeOnCollision = false;
     [SerializeField] private float explosionRadius = 5f;
     [SerializeField] private int explosionDamage = 20;
     [SerializeField] private LayerMask explosionLayers;
@@ -22,6 +25,7 @@ public class Projectile : MonoBehaviour
     public LayerMask targetLayer; // New variable for target layer
 
     private float distanceTraveled = 0f;
+    private float LifeSpend = 0f;
 
     void Start()
     {
@@ -40,56 +44,21 @@ public class Projectile : MonoBehaviour
     void Update()
     {
         distanceTraveled += speed * Time.deltaTime;
+        LifeSpend += Time.deltaTime;
 
         if (distanceTraveled >= maxDistance)
         {
-            Explode();
+            DestroyProjectile();
         }
-    }
 
-    void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Collision Occurred");
-        if (((1 << other.gameObject.layer) & targetLayer) != 0)
-        {
-            Health playerHealth = null;
-            EnemyHealth enemyHealth = null;
-
-            // Check if the collided GameObject is the player
-            if (targetLayer == (targetLayer | (1 << other.gameObject.layer)) && other.gameObject.CompareTag("Player"))
-            {
-                Debug.Log("Player Identified");
-                playerHealth = other.GetComponent<Health>();
-                playerHealth.TakeDamage(damage);
-            }
-            // Check if the collided GameObject is an enemy
-            else if (targetLayer == (targetLayer | (1 << other.gameObject.layer)) && other.gameObject.CompareTag("Enemy"))
-            {
-                enemyHealth = other.GetComponent<EnemyHealth>();
-                enemyHealth.TakeDamage(damage);
-            }
-            // Check if explosion is enabled, and destroy the projectile accordingly
-            if (explodeOnCollision)
-            {
-                Explode();
-            }
-            else
-            {
-                DestroyProjectile();
-            }
-        }
-        // Destroy the projectile if it collides with any other object
-        else
+        if (LifeSpend >= MaxLife)
         {
             DestroyProjectile();
         }
     }
 
-    void DestroyProjectile()
-    {
-        Destroy(gameObject);
-    }
-    private void Explode()
+
+    public void Explode()
     {
         if (explodeOnCollision)
         {
@@ -106,21 +75,36 @@ public class Projectile : MonoBehaviour
                 }
             }
         }
+        else
+        {
+            DestroyProjectile();
+        }
 
         if (explosionParticles != null)
         {
             Instantiate(explosionParticles, transform.position, Quaternion.identity);
         }
 
-        Destroy(gameObject);
+        
     }
 
-    private void OnDrawGizmosSelected()
+    public void OnDrawGizmosSelected()
     {
         if (explodeOnCollision)
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, explosionRadius);
         }
+    }
+
+    public IEnumerator HandleDestroy()
+    {
+        yield return new WaitForSeconds(1.0f);
+        DestroyProjectile();
+    }
+
+    public void DestroyProjectile()
+    {
+        Destroy(gameObject);
     }
 }

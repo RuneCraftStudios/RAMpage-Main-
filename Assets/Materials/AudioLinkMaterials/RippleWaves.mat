@@ -147,7 +147,7 @@ Material:
     - _RippleCenter: {r: 0, g: 0, b: 0, a: 0}
     - _RippleCenter2D: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _Tiling: {r: 5, g: 0.1, b: 0, a: 0}
+    - _Tiling: {r: 3, g: 0.01, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &1059071712604358558
 MonoBehaviour:

@@ -29,7 +29,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 7052377395568714808}
   m_Father: {fileID: 3596998445037266887}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &3326223073690100886
@@ -65,7 +66,7 @@ GameObject:
   - component: {fileID: 213447546159993342}
   - component: {fileID: 7655533434628166513}
   - component: {fileID: 2779617251308006235}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: MeleeWeapon002(Blade)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -131,7 +132,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_InteractionManager: {fileID: 0}
   m_Colliders:
-  - {fileID: 6337162698008223299}
+  - {fileID: 3326223073690100886}
   m_InteractionLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -220,7 +221,7 @@ MonoBehaviour:
   m_OnDeactivate:
     m_PersistentCalls:
       m_Calls: []
-  m_AttachTransform: {fileID: 6775710842327124385}
+  m_AttachTransform: {fileID: 7052377395568714808}
   m_SecondaryAttachTransform: {fileID: 0}
   m_UseDynamicAttach: 0
   m_MatchAttachPosition: 1
@@ -232,7 +233,7 @@ MonoBehaviour:
   m_VelocityDamping: 1
   m_VelocityScale: 1
   m_AngularVelocityDamping: 1
-  m_AngularVelocityScale: 1
+  m_AngularVelocityScale: 0.1
   m_TrackPosition: 1
   m_SmoothPosition: 1
   m_SmoothPositionAmount: 5
@@ -418,6 +419,37 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &7012502811548068770
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7052377395568714808}
+  m_Layer: 0
+  m_Name: HandleTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7052377395568714808
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7012502811548068770}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.0012218892, y: 0.9659151, z: 0.25881612, w: -0.0045601535}
+  m_LocalPosition: {x: -0.037000023, y: 0.2590027, z: 0.06500244}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6775710842327124385}
+  m_LocalEulerAnglesHint: {x: -30, y: 180.541, z: 0}
 --- !u!1 &7017975140488017350
 GameObject:
   m_ObjectHideFlags: 0
@@ -512,12 +544,12 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 47d6c1b35a3bf3541b121772c06d70d0, type: 2}
+      objectReference: {fileID: 2100000, guid: 4344eef7f8c9b7d45a698b403ac14e46, type: 2}
     - target: {fileID: -7511558181221131132, guid: f4b3394d17234664f878eb7dbab9d656,
         type: 3}
       propertyPath: m_Materials.Array.data[1]
       value: 
-      objectReference: {fileID: 2100000, guid: 7edded89b047acf46b1d96858efc73c3, type: 2}
+      objectReference: {fileID: 2100000, guid: 4344eef7f8c9b7d45a698b403ac14e46, type: 2}
     - target: {fileID: 919132149155446097, guid: f4b3394d17234664f878eb7dbab9d656,
         type: 3}
       propertyPath: m_Name
@@ -547,12 +579,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1340655045731361086}
   m_SourcePrefab: {fileID: 100100000, guid: f4b3394d17234664f878eb7dbab9d656, type: 3}
---- !u!64 &6337162698008223299 stripped
-MeshCollider:
-  m_CorrespondingSourceObject: {fileID: 3451118302482216456, guid: f4b3394d17234664f878eb7dbab9d656,
-    type: 3}
-  m_PrefabInstance: {fileID: 8653326017318873163}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &8419378330043864346 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f4b3394d17234664f878eb7dbab9d656,
@@ -576,9 +602,9 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 2048
-  IsHeavy: 0
-  knockbackForce: 0
-  knockbackbuffer: 0
+  IsHeavy: 1
+  knockbackForce: 75
+  knockbackbuffer: 1
   weaponSoundManager: {fileID: 2779617251308006235}
   EnergyCost: 1
   health: {fileID: 5183883371004019928, guid: 4b914d35fdb8a5149850b284a2225d6b, type: 3}

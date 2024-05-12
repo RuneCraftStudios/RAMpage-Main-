@@ -1339,7 +1339,7 @@ MonoBehaviour:
   playerInAttackRange: 0
   StunDuration: 3
   isStunned: 0
-  Projectile: {fileID: 5769944953533130351, guid: 30386e98869a27b46941dcb6ca448db6,
+  Projectile: {fileID: 5769944953533130351, guid: 345cdff958e754d468c713876a236d76,
     type: 3}
   muzzleTransforms:
   - {fileID: 1439092767027093028}

@@ -11,6 +11,10 @@ public class WeaponSoundManager : MonoBehaviour
     public AudioClip[] ChargeClips;
     public AudioClip[] LowEnergyClips;
     public AudioClip[] ImpactClips;
+    public AudioClip[] SkillActivate;
+    public AudioClip[] SkillDeactivate;
+    public AudioClip[] SkillCooldown;
+    public AudioClip[] SkillImpact;
 
     // Adjust this value to change the pitch variation
     public float pitchVariation = 0.1f;
@@ -33,6 +37,24 @@ public class WeaponSoundManager : MonoBehaviour
     public void PlayWeaponImpactClips()
     {
         PlayRandomSound(ImpactClips);
+    }
+
+    public void PlaySkillActivate()
+    {
+        PlayRandomSound(SkillActivate);
+    }
+
+    public void PlaySkillDeactivate()
+    {
+        PlayRandomSound(SkillDeactivate);
+    }
+    public void PlaySkillCooldown()
+    {
+        PlayRandomSound(SkillCooldown);
+    }
+    public void PlaySkillImpact()
+    {
+        PlayRandomSound(SkillImpact);
     }
 
 
